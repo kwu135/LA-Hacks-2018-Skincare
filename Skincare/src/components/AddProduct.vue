@@ -15,6 +15,10 @@
               </b-form-input>
             </b-form-group>
           </b-form>
+          <div>
+            <b-form-select v-model="selectedCategory" :options="categories" class="input85" />
+            <div>{{selectedCategory}}</div>
+          </div>
           <h5> Ingredients 
           </h5>
           
@@ -82,6 +86,20 @@ export default {
       ingredientName: '',
       ingredients: [],
       count: 0,
+      selectedCategory: null,
+      categories: [
+        {value: null, text: 'Choose a category'},
+        {value: 'Moisturizers', text: 'Moisturizers'},
+        {value: 'Cleansers', text: 'Cleansers'},
+        {value: 'Serums', text: 'Serums'},
+        {value: 'Toners', text: 'Toners'},
+        {value: 'Exfoliators', text: 'Exfoliators'},
+        {value: 'Masks', text: 'Masks'},
+        {value: 'Sunscreens', text: 'Sunscreens'},
+        {value: 'Lip Treatments', text: 'Lip Treatments'},
+        {value: 'Face Oils', text: 'Face Oils'},
+        {value: 'Acne Treatments', text: 'Acne Treatments'}
+      ],
       errors: []
     }
   },
@@ -98,7 +116,8 @@ export default {
       if(!this.errors.length) {
         var product = {
           name: this.productName,
-          ingredients: this.ingredients
+          ingredients: this.ingredients,
+          category: this.selectedCategory
         }
         console.log(product);
         console.log('Adding new product');
@@ -172,6 +191,10 @@ export default {
   }
 
   h3, .container-fluid {
+    margin-top: 1em;
+  }
+
+  h5 {
     margin-top: 1em;
   }
 
