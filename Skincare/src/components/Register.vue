@@ -111,13 +111,23 @@ export default {
 
       if(!this.errors.length) {
         var credentials = {
-          firstName: this.credentials.firstName,
-          lastName: this.credentials.lastName,
+          fname: this.credentials.firstName,
+          lname: this.credentials.lastName,
           email: this.credentials.email,
-          password: md5(this.credentials.password)
+          pw: md5(this.credentials.password)
         }
-        console.log('Registering...');
-        console.log(credentials);
+
+        this.$http.post('http://35.185.196.137:3000/signup', credentials).then(response => {
+        
+          if(response.status === 200) {
+            if(response.body.status === 'success') {
+              console.log('Registered');
+            }
+          }
+        
+        }, response => {
+          // error callback
+        });
       }
     }
   }
