@@ -36,7 +36,4 @@ export default {
   text-align: center;
   color: #2c3e50;
 }
-ul {
-  list-style-type: none;
-}
 </style>
