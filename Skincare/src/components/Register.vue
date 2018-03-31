@@ -13,18 +13,28 @@
                             placeholder="Email">
               </b-form-input>
             </b-form-group>
-            <b-form-group id="passGroup">
+            <b-form-group id="pass1">
               <b-form-input type="password" 
-                            id="username"
+                            id="password"
                             v-model="credentials.password"
                             required
                             placeholder="Password">
               </b-form-input>
             </b-form-group>
-            <b-button size="sm" variant="primary" @click="login()">
-              Login
+            <b-form-group id="pass2">
+              <b-form-input type="password" 
+                            id="passwordConfirm"
+                            v-model="credentials.passwordConfirm"
+                            required
+                            placeholder="Confirm Password">
+              </b-form-input>
+            </b-form-group>
+            <b-button size="sm" variant="primary" @click="register()">
+              Register
             </b-button>
           </b-form>
+        </b-col>
+        <b-col md="4" offset-md="4">
           <p v-if="errors.length">
             <ul style="color:red">
               <li v-for="(error,index) in errors" :key='index'>{{ error }}</li>
@@ -38,35 +48,41 @@
 
 <script>
 export default {
-  name: 'Login',
+  name: 'Register',
   data () {
     return {
       credentials: {
         email: '',
-        password: ''
+        password: '',
+        passwordConfirm: ''
       },
       errors: []
     }
   },
   methods: {
-    login() {
+    register() {
       this.errors = [];
 
-      if(this.credentials.email === '') {
-        this.errors.push("Please enter your email");
+      if(this.credentials.email === '' || this.credentials.password === ''
+          || this.credentials.passwordConfirm === '') {
+        this.errors.push("Email and password fields cannot be empty");
       }
 
-      if(this.credentials.password === '') {
-        this.errors.push("Please enter your password");
+      if(!this.credentials.email.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/)) {
+        this.errors.push("Please enter a valid email");
       }
+
+      if(this.credentials.password != this.credentials.passwordConfirm) {
+        this.errors.push("Passwords don't match, please try again");
+      } 
 
       if(!this.errors.length) {
-        // TO-DO
         var credentials = {
           email: this.credentials.email,
           password: this.credentials.password
         }
-        console.log('Logging in');
+        console.log('Registering...');
+        console.log(credentials);
       }
     }
   }
@@ -78,5 +94,4 @@ export default {
     list-style-type: none;
     padding: 0;
   }
-</style>
-
+</style> 
