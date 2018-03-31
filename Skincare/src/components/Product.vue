@@ -4,26 +4,23 @@
       <b-row class="justify-content-md-center">
         <b-col md="6">
             <h1>{{ name }}</h1>
-            <p>
-              <h5> Ingredients </h5>
-              <b-list-group v-for="ingredient in ingredients">
-                <b-list-group-item>{{ ingredient.name }}</b-list-group-item>
-              </b-list-group>
-            </p>
+            <h5> Ingredients </h5>
+            <b-list-group v-for="ingredient in ingredients">
+              <b-list-group-item>{{ ingredient.name }}</b-list-group-item>
+            </b-list-group>
         </b-col>
         <b-col md="4">
           <b-img src="http://via.placeholder.com/300x200" fluid alt="Responsive Image" />
 
-          <b-button class="button" variant='primary' v-if="!userOwnsProduct" @click="addProduct()">I own this product</b-button>
+          <b-button class="button" variant='primary' v-if="!userOwnsProduct" @click="addProduct()">I use this product</b-button>
           <b-button class="button" variant='danger' v-else @click="removeProduct()">I don't own this product</b-button>
 
           <b-button class="button" variant='danger' v-if="!userFlaggedProduct" @click="flagBadProduct()">
             Product doesn't work for me!
           </b-button>
           <b-button class="button" variant='primary' v-else @click="unflagBadProduct()">
-            Unflag bad product
-          </b-button>          
-
+            Product works for me!
+          </b-button>
         </b-col>
     </b-row>
   </b-container>

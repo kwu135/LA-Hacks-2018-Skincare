@@ -81,6 +81,7 @@ export default {
       productName: '',
       ingredientName: '',
       ingredients: [],
+      count: 0,
       errors: []
     }
   },
@@ -106,7 +107,7 @@ export default {
     addIngredient() {
       if(this.ingredientName !== '') {
         var ingredient = this.ingredientName;
-        this.ingredients.push({name: ingredient, id: this.ingredients.length, selected: false});
+        this.ingredients.push({name: ingredient, id: this.count++, selected: false});
         this.ingredientName = '';
       }
     },

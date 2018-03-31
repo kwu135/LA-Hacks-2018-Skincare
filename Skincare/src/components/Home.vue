@@ -30,10 +30,10 @@
 					<h1>Current Regimen</h1>
 				</b-col>
 			</b-row>
-			<b-row v-for="i in Math.ceil(products.length / 3)">
+			<b-row v-for="i in Math.ceil(products.length / 3)" :key='i'>
 				<b-col md="12">
 					<b-card-group deck>
-						<b-card align="center" v-for="product in products.slice((i - 1) * 3, i * 3)">
+						<b-card align="center" v-for="(product,index) in products.slice((i - 1) * 3, i * 3)" :key="index+i*3">
 							<div class="row-flexbox">
 								<div class="row-flexbox-box">
 									<img src="https://storage.googleapis.com/momento/noun_737023_cc.png" class="product-card-img">
@@ -58,10 +58,15 @@
 					<h1>Didn't Work</h1>
 				</b-col>
 			</b-row>
-			<b-row v-for="i in Math.ceil(products.length / 3)">
+			<b-row v-for="i in Math.ceil(products.length / 3)" :key='i'>
 				<b-col md="12">
 					<b-card-group deck>
-						<b-card bg-variant="danger" text-variant="white" align="center" v-for="product in products.slice((i - 1) * 3, i * 3)">
+						<b-card 
+							bg-variant="danger" 
+							text-variant="white" 
+							align="center" 
+							v-for="(product,index) in products.slice((i - 1) * 3, i * 3)"
+							:key="i*3 + index">
 							<div class="row-flexbox">
 								<div class="row-flexbox-box">
 									<img src="https://storage.googleapis.com/momento/noun_737023_cc.png" class="product-card-img">
