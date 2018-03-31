@@ -13,21 +13,29 @@
                             placeholder="Email">
               </b-form-input>
             </b-form-group>
-            <b-form-group id="passGroup">
+            <b-form-group id="pass1">
               <b-form-input type="password" 
-                            id="username"
+                            id="password"
                             v-model="credentials.password"
                             required
                             placeholder="Password">
               </b-form-input>
             </b-form-group>
-            <b-button size="sm" variant="primary" @click="login()">
-              Login
+            <b-form-group id="pass2">
+              <b-form-input type="password" 
+                            id="passwordConfirm"
+                            v-model="credentials.passwordConfirm"
+                            required
+                            placeholder="Confirm Password">
+              </b-form-input>
+            </b-form-group>
+            <b-button size="sm" variant="primary" @click="register()">
+              Register
             </b-button>
           </b-form>
           <p v-if="errors.length">
             <b>Please correct the following error(s):</b>
-            <ul>
+            <ul style="color:red">
               <li v-for="error in errors">{{ error }}</li>
             </ul>
           </p>
@@ -39,28 +47,27 @@
 
 <script>
 export default {
-  name: 'Login',
+  name: 'Register',
   data () {
     return {
       credentials: {
         email: '',
-        password: ''
+        password: '',
+        passwordConfirm: ''
       },
       errors: []
     }
   },
   methods: {
-    login() {
-      console.log('Logging in');
+    register() {
       this.errors = [];
-      var credentials = {
-        email: this.credentials.email,
-        password: this.credentials.password
-      }
-      if(this.credentials.password === '') {
-        this.errors.push("Password cannot be blank");
+      if(this.credentials.password != this.credentials.passwordConfirm) {
+        this.errors.push("Passwords don't match, please try again");
       } else {
-        this.error = '';
+        var credentials = {
+          email: this.credentials.email,
+          password: this.credentials.password
+        }
       }
     }
   }
