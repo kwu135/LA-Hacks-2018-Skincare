@@ -7,6 +7,9 @@
       <b-navbar-brand href="#/">"Skincare"</b-navbar-brand>
 
       <b-collapse is-nav id="nav_collapse">
+        <b-navbar-nav>
+          <b-nav-item href='#/add-product'>Add Product</b-nav-item>
+        </b-navbar-nav>
 
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
@@ -35,8 +38,5 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-}
-ul {
-  list-style-type: none;
 }
 </style>

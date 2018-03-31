@@ -6,7 +6,7 @@
           <br>
           <b-form>
             <b-form-group id="emailGroup">
-              <b-form-input type="text" 
+              <b-form-input type="email" 
                             id="email"
                             v-model="credentials.email"
                             required
@@ -52,13 +52,8 @@ export default {
     login() {
       this.errors = [];
 
-      var credentials = {
-        email: this.credentials.email,
-        password: this.credentials.password
-      }
-
       if(this.credentials.email === '') {
-        this.errors.push("Please enter your username");
+        this.errors.push("Please enter your email");
       }
 
       if(this.credentials.password === '') {
@@ -67,10 +62,21 @@ export default {
 
       if(!this.errors.length) {
         // TO-DO
+        var credentials = {
+          email: this.credentials.email,
+          password: this.credentials.password
+        }
         console.log('Logging in');
       }
     }
   }
 }
 </script>
+
+<style>
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+</style>
 

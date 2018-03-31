@@ -8,11 +8,16 @@ import AddProduct from '@/components/AddProduct'
 import Login from '@/components/Login'
 import Register from '@/components/Register'
 
+import 'vue-awesome/icons'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
+import Icon from 'vue-awesome/components/Icon'
+
 Vue.use(Router)
 Vue.use(BootstrapVue);
+// globally
+Vue.component('icon', Icon)
 
 export default new Router({
   routes: [

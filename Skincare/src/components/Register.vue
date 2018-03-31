@@ -6,7 +6,7 @@
           <br>
           <b-form>
             <b-form-group id="emailGroup">
-              <b-form-input type="text" 
+              <b-form-input type="email" 
                             id="email"
                             v-model="credentials.email"
                             required
@@ -33,6 +33,8 @@
               Register
             </b-button>
           </b-form>
+        </b-col>
+        <b-col md="4" offset-md="4">
           <p v-if="errors.length">
             <ul style="color:red">
               <li v-for="(error,index) in errors" :key='index'>{{ error }}</li>
@@ -60,14 +62,19 @@ export default {
   methods: {
     register() {
       this.errors = [];
-      if(this.credentials.password != this.credentials.passwordConfirm) {
-        this.errors.push("Passwords don't match, please try again");
-      } 
 
       if(this.credentials.email === '' || this.credentials.password === ''
           || this.credentials.passwordConfirm === '') {
         this.errors.push("Email and password fields cannot be empty");
       }
+
+      if(!this.credentials.email.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/)) {
+        this.errors.push("Please enter a valid email");
+      }
+
+      if(this.credentials.password != this.credentials.passwordConfirm) {
+        this.errors.push("Passwords don't match, please try again");
+      } 
 
       if(!this.errors.length) {
         var credentials = {
@@ -82,3 +89,9 @@ export default {
 }
 </script>
 
+<style>
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+</style> 
