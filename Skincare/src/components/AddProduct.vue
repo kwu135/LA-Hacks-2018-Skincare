@@ -16,8 +16,7 @@
           </b-form>
           <h5> Ingredients 
           </h5>
-          <icon name="plus-square" scale=2 color="#33D1FF" v-on:click.native="click()"></icon>
-          <icon name="minus-square" scale=2 color="#FF5533" v-on:click.native="deleteSelected()"></icon> 
+          
           <div class="container-fluid">
             <draggable v-model="ingredients">
               <transition-group name="list-complete">
@@ -32,9 +31,28 @@
               </transition-group>
             </draggable>
           </div>
+          <b-row class="modifiers">
+            <b-col md="8" offset-md="2">
+              <b-form-input class="input" v-model="ingredientName"
+                                type="text"
+                                placeholder="Add an ingredient"
+                                @keydown.native="keydownHandler">
+              </b-form-input>
+              <icon name="plus-square" scale=2 color="#33D1FF" v-on:click.native="addIngredient()"></icon>
+              <icon name="minus-square" scale=2 color="#FF5533" v-on:click.native="deleteSelected()"></icon> 
+            </b-col>
+          </b-row>
         </b-col>
       </b-row>
     </b-container>
+    <b-button class="button" size="md" variant="primary" @click="addProduct()">
+      Submit
+    </b-button>
+    <p v-if="errors.length">
+      <ul style="color:red">
+        <li v-for="(error,index) in errors" :key='index'>{{ error }}</li>
+      </ul>
+    </p> 
   </div>
 </template>
 
@@ -48,52 +66,41 @@ export default {
   data () {
     return {
       productName: '',
-      ingredients: [{
-        id: 1,
-        name: 'Aqua (Water)',
-        selected: false
-      },{
-        id: 2,
-        name: 'Cetearyl Alcohol',
-        selected: false
-      },{
-        id: 3,
-        name: 'Glycerin',
-        selected: false
-      },
-      {
-        id: 4,
-        name: 'Aqua (Water)',
-        selected: false
-      },{
-        id: 5,
-        name: 'Cetearyl Alcohol',
-        selected: false
-      },{
-        id: 6,
-        name: 'Glycerin',
-        selected: false
-      },
-      {
-        id: 7,
-        name: 'Aqua (Water)',
-        selected: false
-      },{
-        id: 8,
-        name: 'Cetearyl Alcohol',
-        selected: false
-      },{
-        id: 9,
-        name: 'Glycerin',
-        selected: false
-      }],
+      ingredientName: '',
+      ingredients: [],
       errors: []
     }
   },
   methods: {
     addProduct() {
+      this.errors = [];
+      if(this.productName === '') {
+        this.errors.push('Please enter a product name');
+      }
+      if(!this.ingredients.length) {
+        this.errors.push('Please enter at least one ingredient');
+      }
+
+      if(!this.errors.length) {
+        var product = {
+          name: this.productName,
+          ingredients: this.ingredients
+        }
+        console.log(product);
+        console.log('Adding new product');
+      }
     },
     addIngredient() {
+      if(this.ingredientName !== '') {
+        var ingredient = this.ingredientName;
+        this.ingredients.push({name: ingredient, id: this.ingredients.length, selected: false});
+        this.ingredientName = '';
+      }
+    },
+    keydownHandler(event) {
+      if(event.which === 13) {
+        this.addIngredient();
+      }
     },
     select(index) {
       this.ingredients[index].selected = !this.ingredients[index].selected;
@@ -128,11 +135,32 @@ export default {
   }
 
   .selected {
-    background-color: grey;
+    background-color: #33D1FF;
+    color:white;
   }
 
-  svg, h5{
+  .input {
+    display: inline;
+    width:40%;
+  }
+
+  svg {
     display: inline; 
-    margin-right: 10px;
+    margin-left: 2px;
+    margin-right: 0.5em;
+    vertical-align: middle;
+  }
+
+  h3, .container-fluid {
+    margin-top: 1em;
+  }
+
+  .button, .modifiers {
+    margin-top: 2em;
+  }
+
+  ul {
+    list-style-type: none;
+    padding: 0;
   }
 </style>
