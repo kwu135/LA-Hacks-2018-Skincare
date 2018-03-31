@@ -14,8 +14,16 @@
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
           <b-navbar-nav>
-            <b-nav-item href="#/login">Login</b-nav-item>
-            <b-nav-item href="#/register">Register</b-nav-item>
+            <b-nav-item-dropdown right v-if="this.$cookie.get('session')">
+              <!-- Using button-content slot -->
+              <template slot="button-content">
+                <em>Hello {{this.$cookie.get('firstName')}} {{this.$cookie.get('lastName')}}</em>
+              </template>
+              <b-dropdown-item @click="logout()">Logout</b-dropdown-item>
+            </b-nav-item-dropdown>
+
+            <b-nav-item v-if="!this.$cookie.get('session')" href="#/login">Login</b-nav-item>
+            <b-nav-item v-if="!this.$cookie.get('session')" href="#/register">Register</b-nav-item>
           </b-navbar-nav> 
         </b-navbar-nav>
 
@@ -26,8 +34,23 @@
 </template>
 
 <script>
+
 export default {
-  name: 'App'
+  name: 'App',
+  data() {
+    return {
+      user: {}
+    }
+  },
+  methods: {
+    logout() {
+      this.$cookie.delete('session');
+      this.$cookie.delete('firstName');
+      this.$cookie.delete('lastName');
+
+      this.$router.push('/login');
+    }
+  }
 }
 </script>
 

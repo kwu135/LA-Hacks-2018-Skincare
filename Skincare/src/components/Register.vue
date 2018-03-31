@@ -5,6 +5,22 @@
         <b-col md="4" offset-md="4">
           <br>
           <b-form>
+            <b-form-group>
+              <b-form-input type="text" 
+                            id="firstName"
+                            v-model="credentials.firstName"
+                            required
+                            placeholder="First Name">
+              </b-form-input>
+            </b-form-group>
+            <b-form-group>
+              <b-form-input type="text" 
+                            id="lastName"
+                            v-model="credentials.lastName"
+                            required
+                            placeholder="Last Name">
+              </b-form-input>
+            </b-form-group>
             <b-form-group id="emailGroup">
               <b-form-input type="email" 
                             id="email"
@@ -47,11 +63,19 @@
 </template>
 
 <script>
+import md5 from 'js-md5';
+
 export default {
   name: 'Register',
+  mounted: function(){
+    // If the user is already logged in, redirect to home
+    this.redirectIfLoggedIn();
+  },
   data () {
     return {
       credentials: {
+        firstName: '',
+        lastName: '',
         email: '',
         password: '',
         passwordConfirm: ''
@@ -60,15 +84,24 @@ export default {
     }
   },
   methods: {
+    redirectIfLoggedIn() {
+      if(this.$cookie.get('session')) {
+        this.$router.push('/');
+      }
+    },
     register() {
       this.errors = [];
+
+      if(this.credentials.firstName === '' || this.credentials.lastName === '') {
+        this.errors.push("First and last name fields cannot be empty");
+      }
 
       if(this.credentials.email === '' || this.credentials.password === ''
           || this.credentials.passwordConfirm === '') {
         this.errors.push("Email and password fields cannot be empty");
       }
 
-      if(!this.credentials.email.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/)) {
+      if(!this.credentials.email.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/i)) {
         this.errors.push("Please enter a valid email");
       }
 
@@ -78,8 +111,10 @@ export default {
 
       if(!this.errors.length) {
         var credentials = {
+          firstName: this.credentials.firstName,
+          lastName: this.credentials.lastName,
           email: this.credentials.email,
-          password: this.credentials.password
+          password: md5(this.credentials.password)
         }
         console.log('Registering...');
         console.log(credentials);

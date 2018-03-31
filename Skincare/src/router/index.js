@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import BootstrapVue from 'bootstrap-vue'
 import Router from 'vue-router'
+import VueCookie from 'vue-cookie';
+
 
 import Home from '@/components/Home'
 import Product from '@/components/Product'
@@ -16,6 +18,7 @@ import Icon from 'vue-awesome/components/Icon'
 
 Vue.use(Router)
 Vue.use(BootstrapVue);
+Vue.use(VueCookie);
 // globally
 Vue.component('icon', Icon)
 

@@ -37,8 +37,14 @@
 </template>
 
 <script>
+import md5 from 'js-md5';
+
 export default {
   name: 'Login',
+  mounted: function(){
+    // If the user is already logged in, redirect to home
+    this.redirectIfLoggedIn();
+  },
   data () {
     return {
       credentials: {
@@ -49,6 +55,11 @@ export default {
     }
   },
   methods: {
+    redirectIfLoggedIn() {
+      if(this.$cookie.get('session')) {
+        this.$router.push('/');
+      }
+    },
     login() {
       this.errors = [];
 
@@ -64,9 +75,15 @@ export default {
         // TO-DO
         var credentials = {
           email: this.credentials.email,
-          password: this.credentials.password
+          password: md5(this.credentials.password)
         }
         console.log('Logging in');
+
+        // Register cookies
+        this.$cookie.set('firstName', 'Yuna', 1);
+        this.$cookie.set('lastName', 'Lee', 1);
+        this.$cookie.set('session', '120sd9f23iw', 1);
+        this.$router.push('/');
       }
     }
   }
