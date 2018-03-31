@@ -6,7 +6,7 @@
           <br>
           <b-form>
             <b-form-group id="emailGroup">
-              <b-form-input type="text" 
+              <b-form-input type="email" 
                             id="email"
                             v-model="credentials.email"
                             required
