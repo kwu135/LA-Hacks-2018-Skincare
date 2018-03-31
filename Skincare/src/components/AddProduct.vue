@@ -16,8 +16,11 @@
             </b-form-group>
           </b-form>
           <div>
-            <b-form-select v-model="selectedCategory" :options="categories" class="input85" />
-            <div>{{selectedCategory}}</div>
+            <b-form-select v-model="selectedCategory" :options="categories" class="input85">
+              <template slot="first">
+                <option :value="null" disabled> Choose Category </option>
+              </template>
+            </b-form-select>
           </div>
           <h5> Ingredients 
           </h5>
@@ -88,7 +91,7 @@ export default {
       count: 0,
       selectedCategory: null,
       categories: [
-        {value: null, text: 'Choose a category'},
+        // {value: null, text: 'Choose a category'},
         {value: 'Moisturizers', text: 'Moisturizers'},
         {value: 'Cleansers', text: 'Cleansers'},
         {value: 'Serums', text: 'Serums'},
@@ -111,6 +114,9 @@ export default {
       }
       if(!this.ingredients.length) {
         this.errors.push('Please enter at least one ingredient');
+      }
+      if(this.selectedCategory === null) {
+        this.errors.push('Please choose a category');
       }
 
       if(!this.errors.length) {
