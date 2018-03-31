@@ -7,6 +7,7 @@
           <b-form>
             <b-form-group>
               <b-form-input type="text"
+                            class="input85"
                             id="productName"
                             v-model="productName"
                             required
@@ -38,8 +39,20 @@
                                 placeholder="Add an ingredient"
                                 @keydown.native="keydownHandler">
               </b-form-input>
-              <icon name="plus-square" scale=2 color="#33D1FF" v-on:click.native="addIngredient()"></icon>
-              <icon name="minus-square" scale=2 color="#FF5533" v-on:click.native="deleteSelected()"></icon> 
+              <icon name="plus-square" 
+                    scale=2 
+                    color="#33D1FF" 
+                    v-on:click.native="addIngredient()"
+                    v-b-tooltip.hover
+                    title="Add new ingredient">
+              </icon>
+              <icon name="minus-square" 
+                    scale=2 
+                    color="#FF5533" 
+                    v-on:click.native="deleteSelected()"
+                    v-b-tooltip.hover
+                    title="Delete selected ingredient(s)">        
+              </icon> 
             </b-col>
           </b-row>
         </b-col>
@@ -141,7 +154,13 @@ export default {
 
   .input {
     display: inline;
-    width:40%;
+    width:60%;
+  }
+
+  .input85 {
+    width:80%;
+    margin-left:10%;
+    margin-right:10%;
   }
 
   svg {
