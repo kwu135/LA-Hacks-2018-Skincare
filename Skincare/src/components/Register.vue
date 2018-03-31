@@ -34,9 +34,8 @@
             </b-button>
           </b-form>
           <p v-if="errors.length">
-            <b>Please correct the following error(s):</b>
             <ul style="color:red">
-              <li v-for="error in errors">{{ error }}</li>
+              <li v-for="(error,index) in errors" :key='index'>{{ error }}</li>
             </ul>
           </p>
         </b-col>
@@ -63,11 +62,20 @@ export default {
       this.errors = [];
       if(this.credentials.password != this.credentials.passwordConfirm) {
         this.errors.push("Passwords don't match, please try again");
-      } else {
+      } 
+
+      if(this.credentials.email === '' || this.credentials.password === ''
+          || this.credentials.passwordConfirm === '') {
+        this.errors.push("Email and password fields cannot be empty");
+      }
+
+      if(!this.errors.length) {
         var credentials = {
           email: this.credentials.email,
           password: this.credentials.password
         }
+        console.log('Registering...');
+        console.log(credentials);
       }
     }
   }

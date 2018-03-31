@@ -26,9 +26,8 @@
             </b-button>
           </b-form>
           <p v-if="errors.length">
-            <b>Please correct the following error(s):</b>
-            <ul>
-              <li v-for="error in errors">{{ error }}</li>
+            <ul style="color:red">
+              <li v-for="(error,index) in errors" :key='index'>{{ error }}</li>
             </ul>
           </p>
         </b-col>
@@ -51,16 +50,24 @@ export default {
   },
   methods: {
     login() {
-      console.log('Logging in');
       this.errors = [];
+
       var credentials = {
         email: this.credentials.email,
         password: this.credentials.password
       }
+
+      if(this.credentials.email === '') {
+        this.errors.push("Please enter your username");
+      }
+
       if(this.credentials.password === '') {
-        this.errors.push("Password cannot be blank");
-      } else {
-        this.error = '';
+        this.errors.push("Please enter your password");
+      }
+
+      if(!this.errors.length) {
+        // TO-DO
+        console.log('Logging in');
       }
     }
   }
