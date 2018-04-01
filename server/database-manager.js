@@ -233,6 +233,15 @@ class DatabaseManager
 		return deferred.promise;
 	}
 
+	getProductInfo(productHash) {
+		const query = datastore.createQuery('Product').filter('hash', '=', productHash);
+		return datastore.runQuery(query).then(results => {
+			const info = results[0][0];
+			delete info.hash;
+			return info;
+		});
+	}
+
 
 	// getUserProducts(userId) {
  //    const query = datastore.createQuery('User').filter('email', '=', email);

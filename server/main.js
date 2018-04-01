@@ -132,18 +132,38 @@ app.post('/get-product-list', function(req, res) {
 	database.getProductList(req.body.email, req.body.sessionToken).then((productList) => {
 		if (productList != null) {
 			res.status(200);
-			res.send({
-				productList: productList,
-				success: true
-			});
+			res.send({success: true, err: "", data: productList});
 		} else {
 			res.status(500);
-			res.send({ success: false });
+			res.send({ success: false, err: "Failed to retrieve product list." });
 		}
 	}).catch((err) => {
 		console.log(err);
 		res.status(500);
-		res.send({ success: false });
+		res.send({ success: false, err: err });
+	});
+});
+
+/* Get all information about specified product */
+app.get('/product-info', function(req, res) {
+	if (!req.query.productHash) {
+		res.status(400);
+		res.send("Missing product hash.");
+		return;
+	}
+	// Get product info
+	database.getProductInfo(req.query.productHash).then((productInfo) => {
+		if (productInfo != null) {
+			res.status(200);
+			res.send({success: true, err: "", data: productInfo});
+		} else {
+			res.status(500);
+			res.send({success: false, err: "Failed to retrieve product info."});
+		}
+	}).catch((err) => {
+		console.log(err);
+		res.status(500);
+		res.send({ success: false, err: err });
 	});
 });
 
