@@ -542,7 +542,7 @@ class DatabaseManager
             for (var i=0; i < user.flaggedProductList.length; i++) {
                 var product = user.flaggedProductList[i];
                 // Query product’s ingredients list
-                const query = datastore.createQuery(‘Product’).filter('name', '=', product);
+                const query = datastore.createQuery('Product').filter('name', '=', product);
                 var promise = datastore.runQuery(query).then(results => {
                     return results[0][0].ingredients;
                 });
