@@ -322,6 +322,30 @@ app.post('/get-ingredients-from-picture', upload.single("picture"), function(req
 	});
 });
 
+app.post(‘/get-threat-ingredients’, function (req, res) {
+    if (!req.body.email || !req.body.sessionToken) {
+        res.status(400);
+        res.send(“Missing session validation information.“);
+        return;
+    }
+    // Get threat ingredients
+    database.getThreatIngredients(req.body.email, req.body.sessionToken)
+        .then((threatIngredients) => {
+        if (threatIngredients != null) {
+            res.status(200);
+            res.send({success: true, err: “”, data: threatIngredients});
+        } else {
+            res.status(500);
+            res.send({success: false, err: “Failed to get threat ingredients.“});
+        }
+    }).catch((err) => {
+        console.log(err);
+        res.status(500);
+        res.send({ success: false, err: err });
+    });
+
+});
+
 app.listen(3000);
 console.log("Server started on port 3000");
 

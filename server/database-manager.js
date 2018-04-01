@@ -525,6 +525,71 @@ class DatabaseManager
 
 		return deferred.promise;
 	}
+
+	getThreatIngredients(email, sessionToken) {
+        let deferred = Q.defer();
+        let user;
+        var ingredientCounts = {}
+
+        this.validateSessionToken(email, sessionToken).then((tempUser) => {
+            user = tempUser;
+            if (!user) {
+                deferred.reject(“Invalid session token.“);
+                return;
+            }
+            var promises = [];
+            // Get ingredient counts
+            for (var i=0; i < user.flaggedProductList.length; i++) {
+                var product = user.flaggedProductList[i];
+                // Query product’s ingredients list
+                const query = datastore.createQuery(‘Product’).filter(‘name’, ‘=’, product);
+                var promise = datastore.runQuery(query).then(results => {
+                    return results[0][0].ingredients;
+                });
+                promises.push(promise);
+            }
+            return Q.all(promises).then((products_ingredients) => {
+                for (var i=0; i < products_ingredients.length; i++) {
+                    (products_ingredients[i]).forEach(function(element) {
+                        if (element in ingredientCounts) {
+                            ingredientCounts[element]++;
+                        } else {
+                            ingredientCounts[element] = 1;
+                        }
+                    })
+                }
+                // Select top 5 ingredients to return
+                let threatIngredients = [];
+                for (var key in ingredientCounts) {
+                    if (threatIngredients.length < 5) {
+                        threatIngredients.push(key);
+                    }
+                    else {
+                        // Get min
+                        if (threatIngredients.length == 0) break;
+                        var minCount = ingredientCounts[threatIngredients[0]];
+                        var minIndex = 0;
+                        for (var i = 0; i < threatIngredients.length; i++) {
+                            if (ingredientCounts[threatIngredients[i]] < minCount) {
+                                minCount = ingredientCounts[threatIngredients[i]];
+                                minIndex = i;
+                            }
+                        }
+                        // Add if greater than min, take out min
+                        if (ingredientCounts[key] > minCount) {
+                            threatIngredients.splice(minIndex, 1);
+                            threatIngredients.push(key);
+                        }
+                    }
+                }
+                // for (var i = 0; i < threatIngredients.length; i++) {
+                //     console.log(threatIngredients[i]);
+                // }
+                deferred.resolve(threatIngredients);
+            });
+        });
+        return deferred.promise;
+    }
 }
 
 module.exports = DatabaseManager;
