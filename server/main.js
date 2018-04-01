@@ -52,6 +52,7 @@ app.post('/login', function(req, res) {
 	}
 	// Attempt login
 	database.authenticateUser(req.body.email, req.body.pw).then((userInfo) => {
+		console.log(userInfo);
 		if (userInfo) {
 			res.status(200);
 			res.send({ success: true, err:"", data: {

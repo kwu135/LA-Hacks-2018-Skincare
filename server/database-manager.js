@@ -65,7 +65,8 @@ class DatabaseManager
 		let cookie;
 		let transaction = null;
 		let userInfo;
-		return datastore.runQuery(query).then(results => {
+		
+		datastore.runQuery(query).then(results => {
 			if (results[0].length == 0) {
 				deferred.reject("Invalid email");
 				return;
@@ -74,6 +75,7 @@ class DatabaseManager
 			let user = results[0][0];
 			userKey = user[datastore.KEY];
 			userInfo = results[0][0];
+			console.log(userInfo);
 			const userpw = results[0][0].pw;
 			// Check password
 			if (pw === userpw) {
@@ -82,6 +84,7 @@ class DatabaseManager
 				return transaction.run();
 			} else {
 				deferred.reject("Password mismatch");
+				return;
 			}
 		}).then(() => transaction.get(userKey)).then(results => {
 			const user = results[0];
