@@ -517,7 +517,7 @@ class DatabaseManager
 			const detections = results[0].textAnnotations;
 			detections.forEach(text => console.log(text));
 
-			deferred.resolve(detections);
+			deferred.resolve(detections[0].description);
 		}).catch((err) => {
 			console.error('Error in getIngredientsFromPicture():', err);
 			deferred.reject(err);
