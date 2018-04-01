@@ -12,6 +12,8 @@ class DatabaseManager
 	/* Adds a new user to database */
 	addUser(fname, lname, email, pw) {
 		var deferred = Q.defer();
+		let cookie;
+		
 		const userKey = datastore.key('User');
 		// Check for duplicate entity
 		const query = datastore.createQuery('User').filter('email', '=', email);
@@ -21,6 +23,7 @@ class DatabaseManager
 				return;
 			}
 			// New user entity
+			cookie = this.generate_key();
 			const entity = {
 				key: userKey,
 				data: [
@@ -30,13 +33,18 @@ class DatabaseManager
 					{name: 'pw', value: pw},
 					{name: 'productList', value: []},
 					{name: 'flaggedProductList', value: []},
-					{name: 'sessionToken', value: ""}
+					{name: 'sessionToken', value: cookie}
 				]
 			};
 			// Add entity to database
 			return datastore.save(entity).then(() => {
 				console.log('User %d created successfully.', userKey.id);
-				deferred.resolve(true);
+				deferred.resolve({
+					"fname": fname,
+					"lname": lname,
+					"email": email,
+					"sessionToken": cookie
+				});
 			});
 		});
 		return deferred.promise;
@@ -132,7 +140,7 @@ class DatabaseManager
 					{name: 'name', value: productName},
 					{name: 'category', value: category},
 					{name: 'ingredients', value: ingredients},
-					{name: 'hash', value: md5(productName)}
+					{name: 'hash', value: md5(productName).substring(0, 10)}
 				]
 			};
 			// Add product to database

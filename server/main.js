@@ -21,18 +21,23 @@ app.post('/signup', function(req, res) {
 		return;
 	}
 	// Attempt registration
-	database.addUser(req.body.fname, req.body.lname, req.body.email, req.body.pw).then((success) => {
-		if (success) {
+	database.addUser(req.body.fname, req.body.lname, req.body.email, req.body.pw).then((userInfo) => {
+		if (userInfo) {
 			res.status(200);
-			res.send({ success: true });
+			res.send({
+				"fname": userInfo.fname,
+				"lname": userInfo.lname,
+				"email": userInfo.email,
+				"sessionToken": userInfo.sessionToken
+			});
 		} else {
 			res.status(500);
-			res.send({ success: false });
+			res.send({ success: false, err: "Invalid user." });
 		}
 	}).catch((err) => {
 		console.log(err);
 		res.status(500);
-		res.send({ success: false });
+		res.send({ success: false, err: err });
 	});
 });
 
@@ -57,12 +62,12 @@ app.post('/login', function(req, res) {
 			});
 		} else {
 			res.status(500);
-			res.send("Invalid login details.");
+			res.send({ success: false, err: "Invalid user." });
 		}
 	}).catch((err) => {
 		console.log(err);
 		res.status(500);
-		res.send("Login error.");
+		res.send({ success: false, err: err });
 	});
 });
 
