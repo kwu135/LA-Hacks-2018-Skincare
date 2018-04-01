@@ -21,7 +21,7 @@
                             placeholder="Password">
               </b-form-input>
             </b-form-group>
-            <b-button size="sm" variant="primary" @click="login()">
+            <b-button size="md" variant="info" @click="login()">
               Login
             </b-button>
           </b-form>
@@ -91,6 +91,7 @@ export default {
           this.$router.push('/');
         }, response => {
           // error callback
+          console.log("Failed to log in: " + response);
         });
       }
     }
