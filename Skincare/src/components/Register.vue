@@ -121,8 +121,15 @@ export default {
         
           if(response.status === 200) {
             if(response.body.success) {
-              console.log('Registered');
-              this.$router.push('/login');
+              // get body data
+              let data = response.body;
+
+              // Register cookies
+              this.$cookie.set('firstName', data.fname, 1);
+              this.$cookie.set('lastName', data.lname, 1);
+              this.$cookie.set('session', data.sessionToken, 1);
+              this.$cookie.set('email', data.email, 1);
+              this.$router.push('/');
             }
           }
         
