@@ -1,28 +1,4 @@
 <template>
-<!-- 	<div class="container">
-		<div class="row justify-content-md-center">
-			<div class="col col-lg-6">
-				<b-card-group deck>
-					<div v-for="product in products">
-						<b-card 
-							title="Card title"
-							sub-title="Card subtitle"
-							class="product-card">
-						<img src="https://storage.googleapis.com/momento/default_product.png" class="product-card-img">
-						<p class="card-text">
-							{{ product.name }}
-							Some quick example text to build on the <em>card title</em> and make up the bulk of the card's content.
-						</p>
-						<a href="#"
-						   class="card-link">Card link</a>
-						<b-link href="#"
-								class="card-link">Another link</b-link>
-						</b-card>
-					</div>
-				</b-card-group>
-			</div>
-		</div>
-	</div> -->
 	<div>
 		<b-container>
 			<b-row class="pt-3">
@@ -30,10 +6,12 @@
 					<h1>Current Regimen</h1>
 				</b-col>
 			</b-row>
-			<b-row v-for="i in Math.ceil(products.length / 3)">
+			<b-row v-for="i in Math.ceil(routineProducts.length / 3)">
 				<b-col md="12">
 					<b-card-group deck>
-						<b-card align="center" v-for="(product,index) in products.slice((i - 1) * 3, i * 3)">
+						<b-card align="center" 
+								v-for="(product,index) in routineProducts.slice((i - 1) * 3, i * 3)"
+								v-on:click="redirect(product.hash)">
 							<div class="row-flexbox">
 								<div class="row-flexbox-box">
 									<img src="https://storage.googleapis.com/momento/noun_737023_cc.png" class="product-card-img">
@@ -48,24 +26,20 @@
 					</b-card-group>
 				</b-col>
 			</b-row>
-			<!-- <b-row>
-				<b-col>
-					<b-button variant="success lg" class="btn-block">+</b-button>
-				</b-col>
-			</b-row> -->
 			<b-row>
 				<b-col md="12" align="left" class="py-2">
 					<h1>Didn't Work</h1>
 				</b-col>
 			</b-row>
-			<b-row v-for="i in Math.ceil(products.length / 3)">
+			<b-row v-for="i in Math.ceil(threatProducts.length / 3)">
 				<b-col md="12">
 					<b-card-group deck>
 						<b-card 
 							bg-variant="danger" 
 							text-variant="white" 
 							align="center" 
-							v-for="(product,index) in products.slice((i - 1) * 3, i * 3)">
+							v-for="(product,index) in threatProducts.slice((i - 1) * 3, i * 3)"
+							v-on:click="redirect(product.hash)">
 							<div class="row-flexbox">
 								<div class="row-flexbox-box">
 									<img src="https://storage.googleapis.com/momento/noun_737023_cc.png" class="product-card-img">
@@ -124,55 +98,42 @@
 </style>
 
 <script>
+import md5 from 'js-md5';
+
 export default {
 	name: 'Home',
+	mounted: function() {
+		if(!this.$cookie.get('session')) {
+			this.$router.push('/login');
+		}
+
+		var baseUrl = 'http://35.185.196.137:3000'
+
+		var credentials = {
+			email: this.$cookie.get('email'),
+			sessionToken: this.$cookie.get('session'),
+		};
+		this.$http.post(baseUrl + '/get-product-lists',credentials).then(response => {
+		  if(response.status === 200) {
+		    if(response.body.success) {
+		      var routines = response.body.data.productList;
+		      var threats = response.body.data.flaggedProductList;
+		      routines.forEach((product)=> {
+		      	this.routineProducts.push({name: product, hash: md5(product)});
+		      });
+		      threats.forEach((threat)=> {
+		      	this.threatProducts.push({name: threat, hash: md5(threat)});
+		      });
+		    }
+		  }
+		}, response => {
+		  console.log("Failed to load data for product lists");
+		});
+	},
 	data () {
 		return {
-			title: 'Default home page',
-			products: [
-				{
-					name: 'Product 1',
-					ingredients: [
-						'Water',
-						'Stuff'
-					]
-				},
-				{
-					name: 'Product 2',
-					ingredients: [
-						'Fire',
-						'Not Stuff'
-					]
-				},
-				{
-					name: 'Product 1',
-					ingredients: [
-						'Water',
-						'Stuff'
-					]
-				},
-				{
-					name: 'Product 2',
-					ingredients: [
-						'Fire',
-						'Not Stuff'
-					]
-				},
-				{
-					name: 'Product 1',
-					ingredients: [
-						'Water',
-						'Stuff'
-					]
-				},
-				{
-					name: 'Product 2',
-					ingredients: [
-						'Fire',
-						'Not Stuff'
-					]
-				}
-			],
+			routineProducts: [],
+			threatProducts: [],
 			harmfulIngredients: [
 				{
 					name: 'Ingredient 1'
@@ -180,7 +141,13 @@ export default {
 				{
 					name: 'Ingredient 2'
 				}
-			]
+			],
+		}
+	},
+	methods: {
+		redirect(hash) {
+			hash = hash.substr(0,10);
+			this.$router.push('/product/' + hash);
 		}
 	}
 }

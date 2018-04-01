@@ -7,7 +7,7 @@
           <b-form>
             <b-form-group>
               <b-form-input type="text"
-                            class="input85"
+                            class="product-field"
                             id="productName"
                             v-model="productName"
                             required
@@ -16,7 +16,7 @@
             </b-form-group>
           </b-form>
           <div>
-            <b-form-select v-model="selectedCategory" :options="categories" class="input85">
+            <b-form-select v-model="selectedCategory" :options="categories" class="product-field">
               <template slot="first">
                 <option :value="null" disabled> Choose Category </option>
               </template>
@@ -41,21 +41,21 @@
           </div>
           <b-row class="modifiers">
             <b-col md="8" offset-md="2">
-              <b-form-input class="input" v-model="ingredientName"
+              <b-form-input class="ingredient-input" v-model="ingredientName"
                                 type="text"
                                 placeholder="Add an ingredient"
                                 @keydown.native="keydownHandler">
               </b-form-input>
               <icon name="plus-square" 
                     scale=2 
-                    color="#33D1FF" 
+                    color="#0099CC" 
                     v-on:click.native="addIngredient()"
                     v-b-tooltip.hover
                     title="Add new ingredient">
               </icon>
               <icon name="minus-square" 
                     scale=2 
-                    color="#FF5533" 
+                    color="#CC0000" 
                     v-on:click.native="deleteSelected()"
                     v-b-tooltip.hover
                     title="Delete selected ingredient(s)">        
@@ -65,7 +65,7 @@
         </b-col>
       </b-row>
     </b-container>
-    <b-button class="button" size="md" variant="primary" @click="addProduct()">
+    <b-button class="button" size="md" variant="info" @click="addProduct()">
       Submit
     </b-button>
     <p v-if="errors.length">
@@ -78,7 +78,6 @@
 
 <script>
 import draggable from 'vuedraggable'
-import _ from 'lodash'
 
 export default {
   name: 'Login',
@@ -91,7 +90,6 @@ export default {
       count: 0,
       selectedCategory: null,
       categories: [
-        // {value: null, text: 'Choose a category'},
         {value: 'Moisturizers', text: 'Moisturizers'},
         {value: 'Cleansers', text: 'Cleansers'},
         {value: 'Serums', text: 'Serums'},
@@ -121,12 +119,29 @@ export default {
 
       if(!this.errors.length) {
         var product = {
-          name: this.productName,
-          ingredients: this.ingredients,
-          category: this.selectedCategory
+          productName: this.productName,
+          ingredients: [],
+          category: this.selectedCategory,
+          email: this.$cookie.get('email'),
+          sessionToken: this.$cookie.get('session')
         }
-        console.log(product);
-        console.log('Adding new product');
+
+        // Iterate through all ingredients and extract names
+        this.ingredients.forEach((ingredient) => {
+          product.ingredients.push(ingredient.name);
+        });
+
+        this.$http.post('http://35.185.196.137:3000/create-new-product', product).then(response => {
+          if(response.status === 200) {
+            if(response.body.success) {
+              console.log('Added new product');
+              this.$router.push('/product/' + response.body.data.substring(0,10));
+            }
+          }
+        }, response => {
+          // error callback
+          console.log("Failed to create new product: " + response);
+        });
       }
     },
     addIngredient() {
@@ -178,12 +193,12 @@ export default {
     color:white;
   }
 
-  .input {
+  .ingredient-input {
     display: inline;
     width:60%;
   }
 
-  .input85 {
+  .product-field {
     width:80%;
     margin-left:10%;
     margin-right:10%;

@@ -10,6 +10,7 @@ import Product from '@/components/Product'
 import AddProduct from '@/components/AddProduct'
 import Login from '@/components/Login'
 import Register from '@/components/Register'
+import Search from '@/components/Search'
 
 import 'vue-awesome/icons'
 import 'bootstrap/dist/css/bootstrap.css'
@@ -51,6 +52,11 @@ export default new Router({
       path: '/add-product',
       name: 'add-product',
       component: AddProduct
+    },
+    {
+      path: '/search',
+      name: 'search',
+      component: Search
     }
   ]
 })

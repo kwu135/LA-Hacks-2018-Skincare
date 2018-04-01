@@ -8,7 +8,8 @@
 
       <b-collapse is-nav id="nav_collapse">
         <b-navbar-nav>
-          <b-nav-item href='#/add-product'>Add Product</b-nav-item>
+          <b-nav-item href='#/add-product'>Add New Product</b-nav-item>
+          <b-nav-item href='#/search'>Search</b-nav-item>
         </b-navbar-nav>
 
         <!-- Right aligned nav items -->
@@ -56,11 +57,17 @@ export default {
 </script>
 
 <style>
+html, body {
+  height:100%;
+}
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  background-color: #f9f9f9;
+  height: 100%;
 }
 </style>
