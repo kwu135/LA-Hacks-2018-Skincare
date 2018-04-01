@@ -258,6 +258,29 @@ app.post('/check-product-in-lists', function(req, res) {
 	});
 });
 
+/* Returns product that matches query string */
+app.get('/product-search', function(req, res) {
+	if (!req.query.q) {
+		res.status(400);
+		res.send("Missing query string.");
+		return;
+	}
+	// Get product info
+	database.productSearch(req.query.q).then((searchResults) => {
+		if (searchResults != null) {
+			res.status(200);
+			res.send({success: true, err: "", data: searchResults});
+		} else {
+			res.status(500);
+			res.send({success: false, err: "Failed to search for query string."});
+		}
+	}).catch((err) => {
+		console.log(err);
+		res.status(500);
+		res.send({ success: false, err: err });
+	});
+});
+
 app.listen(3000);
 
 

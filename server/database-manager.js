@@ -466,6 +466,19 @@ class DatabaseManager
 
 		return deferred.promise;
 	}
+
+	productSearch(queryString) {
+		console.log(queryString);
+		const query = datastore.createQuery('Product').filter('name', '>=', queryString).filter('name', '<', queryString + "\ufffd");
+		
+		return datastore.runQuery(query).then(results => {
+			const searchResults = results[0];
+			searchResults.forEach(function(element) {
+				delete element.hash;
+			});
+			return searchResults;
+		});
+	}
 }
 
 module.exports = DatabaseManager;
