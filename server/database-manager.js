@@ -498,9 +498,6 @@ class DatabaseManager
 		
 		return datastore.runQuery(query).then(results => {
 			const searchResults = results[0];
-			searchResults.forEach(function(element) {
-				delete element.hash;
-			});
 			return searchResults;
 		});
 	}
