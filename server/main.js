@@ -120,8 +120,33 @@ app.post('/add-product-to-routine', function(req, res) {
 	});
 });
 
+app.post('/remove-product-from-routine', function(req, res) {
+	console.log(req.body);
+		// Check parameters aren't null
+	if (!req.body.productHash || !req.body.email || !req.body.sessionToken) {
+		req.status(400);
+		req.send("Missing information.");
+		return;
+	}
+	// Add product
+	database.removeProductFromRoutine(req.body.productHash, req.body.email,
+		req.body.sessionToken).then((success) => {
+		if (success) {
+			res.status(200);
+			res.send({ success: true, err: "" });
+		} else {
+			res.status(500);
+			res.send({ success: false, err: "Failed to remove product from routine." });
+		}
+	}).catch((err) => {
+		console.log(err);
+		res.status(500);
+		res.send({ success: false, err: err });
+	});
+})
+
 /* Get a user's list of products */
-app.post('/get-product-list', function(req, res) {
+app.post('/get-product-lists', function(req, res) {
 	console.log(req.body);
 	if (!req.body.email || !req.body.sessionToken) {
 		res.status(400);
@@ -129,10 +154,10 @@ app.post('/get-product-list', function(req, res) {
 		return;
 	}
 	// Get product list
-	database.getProductList(req.body.email, req.body.sessionToken).then((productList) => {
-		if (productList != null) {
+	database.getProductList(req.body.email, req.body.sessionToken).then((productLists) => {
+		if (productLists != null) {
 			res.status(200);
-			res.send({success: true, err: "", data: productList});
+			res.send({success: true, err: "", data: productLists});
 		} else {
 			res.status(500);
 			res.send({ success: false, err: "Failed to retrieve product list." });
@@ -159,6 +184,72 @@ app.get('/product-info', function(req, res) {
 		} else {
 			res.status(500);
 			res.send({success: false, err: "Failed to retrieve product info."});
+		}
+	}).catch((err) => {
+		console.log(err);
+		res.status(500);
+		res.send({ success: false, err: err });
+	});
+});
+
+/* Add a threat flag to product */
+app.post('/add-threat-flag-to-product', function(req, res) {
+	if (!req.body.productHash || !req.body.email || !req.body.sessionToken) {
+		res.status(400);
+		res.send("Missing arguments");
+	}
+
+	database.addThreatFlagToProduct(req.body.productHash, req.body.email, req.body.sessionToken).then((success) => {
+		if (success) {
+			res.status(200);
+			res.send({success: success, err: ""});
+		} else {
+			res.status(500);
+			res.send({ success: success, err: "Failed to add threat flag." });
+		}
+	}).catch((err) => {
+		console.log(err);
+		res.status(500);
+		res.send({ success: success, err: err });
+	});
+});
+
+/* Add a threat flag to product */
+app.post('/remove-threat-flag-from-product', function(req, res) {
+	if (!req.body.productHash || !req.body.email || !req.body.sessionToken) {
+		res.status(400);
+		res.send("Missing arguments");
+	}
+	
+	database.removeThreatFlagToProduct(req.body.productHash, req.body.email, req.body.sessionToken).then((success) => {
+		if (success) {
+			res.status(200);
+			res.send({success: success, err: ""});
+		} else {
+			res.status(500);
+			res.send({ success: success, err: "Failed to remove threat flag." });
+		}
+	}).catch((err) => {
+		console.log(err);
+		res.status(500);
+		res.send({ success: success, err: err });
+	});
+});
+
+/* Checks if product is in specified list (regular or thread) */
+app.post('/check-product-in-lists', function(req, res) {
+	if (!req.body.productHash || !req.body.email || !req.body.sessionToken) {
+		res.status(400);
+		res.send("Missing arguments");
+	}
+	
+	database.checkProductInLists(req.body.productHash, req.body.email, req.body.sessionToken).then((inList) => {
+		if (inList != null) {
+			res.status(200);
+			res.send({success: true, err: "", data: inList});
+		} else {
+			res.status(500);
+			res.send({ success: false, err: "Failed to check product in lists." });
 		}
 	}).catch((err) => {
 		console.log(err);

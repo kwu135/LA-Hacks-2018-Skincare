@@ -29,6 +29,7 @@ class DatabaseManager
 					{name: 'email', value: email},
 					{name: 'pw', value: pw},
 					{name: 'productList', value: []},
+					{name: 'flaggedProductList', value: []},
 					{name: 'sessionToken', value: ""}
 				]
 			};
@@ -93,7 +94,7 @@ class DatabaseManager
 			// Get user information
 			let user = results[0][0];
 			if (sessionToken === user.sessionToken) {
-				return user[datastore.KEY];
+				return user;
 			} else {
 				return "";
 			}
@@ -108,7 +109,8 @@ class DatabaseManager
 		let transaction = null;
 
 		// Validate session token
-		this.validateSessionToken(email, sessionToken).then((tempUserKey) => {
+		this.validateSessionToken(email, sessionToken).then((tempUser) => {
+			let tempUserKey = tempUser[datastore.KEY];
 			if (tempUserKey !== "") {
 				// Check for duplicate product entities
 				userKey = tempUserKey;
@@ -169,7 +171,8 @@ class DatabaseManager
 		let productName;
 
 		// Validate session token
-		this.validateSessionToken(email, sessionToken).then((tempUserKey) => {
+		this.validateSessionToken(email, sessionToken).then((tempUser) => {
+			let tempUserKey = tempUser[datastore.KEY];
 			if (tempUserKey !== "") {
 				userKey = tempUserKey;
 				// Get product name from hash
@@ -215,10 +218,71 @@ class DatabaseManager
 		return deferred.promise;
 	}
 
+	removeProductFromRoutine(productHash, email, sessionToken) {
+		let deferred = Q.defer();
+		let userKey;
+		let transaction = null;
+		let productName;
+
+		// Validate session token
+		this.validateSessionToken(email, sessionToken).then((tempUser) => {
+			let tempUserKey = tempUser[datastore.KEY];
+			if (tempUserKey !== "") {
+				userKey = tempUserKey;
+				// Get product name from hash
+				const query = datastore.createQuery('Product').filter('hash', '=', productHash);
+				return datastore.runQuery(query);
+			} else {
+				deferred.reject("Invalid session token");
+				return;
+			}
+		}).then((results) => {
+			// Product hash not in database
+			if (results[0].length == 0) {
+				deferred.reject("Product does not exist.");
+				return;
+			}
+			// Get product name from hash
+			productName = results[0][0].name;
+			transaction = datastore.transaction();
+			return transaction.run();
+		}).then(() => transaction.get(userKey)).then(results => {
+			// Remove product from user's list
+			const user = results[0];
+			if (!user.productList) {
+				deferred.reject("Product is not on user's list.");
+				return;
+			} else {
+				const index = user.productList.indexOf(productName);
+				if (index == -1) {
+					deferred.reject("Product is not on user's list.");
+					return;
+				}
+				user.productList.splice(index, 1);
+			}
+			transaction.save({
+				key: userKey,
+				data: user
+			});
+			return transaction.commit();
+		}).then(() => {
+			deferred.resolve(true);
+		}).catch((err) => {
+			if (!transaction) {
+				transaction.rollback();
+			}
+			console.log(err);
+			deferred.reject("transaction failed");
+		});
+
+		return deferred.promise;
+	}
+
 	getProductList(email, sessionToken) {
 		let deferred = Q.defer();
 
-		this.validateSessionToken(email, sessionToken).then((tempUserKey) => {
+		this.validateSessionToken(email, sessionToken).then((tempUser) => {
+			let tempUserKey = tempUser[datastore.KEY];
 			if (tempUserKey !== "") {
 				const query = datastore.createQuery('User').filter('email', '=', email);
 				return datastore.runQuery(query);
@@ -227,7 +291,10 @@ class DatabaseManager
 				return;
 			}
 		}).then(results => {
-			deferred.resolve(results[0][0].productList);
+			deferred.resolve({
+				productList: results[0][0].productList,
+				flaggedProductList: results[0][0].flaggedProductList
+			});
 		});
 
 		return deferred.promise;
@@ -242,18 +309,163 @@ class DatabaseManager
 		});
 	}
 
+	addThreatFlagToProduct(productHash, email, sessionToken) {
+		let deferred = Q.defer();
+		let userKey;
+		let transaction = null;
+		let productName;
 
-	// getUserProducts(userId) {
- //    const query = datastore.createQuery('User').filter('email', '=', email);
- //    datastore.runQuery(query).then(results => {
- //        const products = results[0][0].products;
+		// Validate session token
+		this.validateSessionToken(email, sessionToken).then((tempUser) => {
+			let tempUserKey = tempUser[datastore.KEY];
+			if (tempUserKey !== "") {
+				userKey = tempUserKey;
+				// Get product name from hash
+				const query = datastore.createQuery('Product').filter('hash', '=', productHash);
+				return datastore.runQuery(query);
+			} else {
+				deferred.reject("Invalid session token");
+				return;
+			}
+		}).then((results) => {
+			// Product hash not in database
+			if (results[0].length == 0) {
+				deferred.reject("Product does not exist.");
+				return;
+			}
+			// Get product name from hash
+			productName = results[0][0].name;
+			transaction = datastore.transaction();
+			return transaction.run();
+		}).then(() => transaction.get(userKey)).then(results => {
+			// Add product to user's list
+			const user = results[0];
+			if (!user.flaggedProductList) {
+				user.flaggedProductList = [productName];
+			} else {
+				user.flaggedProductList.push(productName);
+			}
+			transaction.save({
+				key: userKey,
+				data: user
+			});
+			return transaction.commit();
+		}).then(() => {
+			deferred.resolve(true);
+		}).catch((err) => {
+			if (!transaction) {
+				transaction.rollback();
+			}
+			console.log(err);
+			deferred.reject("transaction failed");
+		});
 
- //        for (var i = products.length - 1; i >= 0; i--) {
- //            //const query = datastore.createQuery('Product').filter('products[i]
- //        }
- //        else return false;
- //    });
-	// }
+		return deferred.promise;
+	}
+
+	removeThreatFlagToProduct(productHash, email, sessionToken) {
+		let deferred = Q.defer();
+		let userKey;
+		let transaction = null;
+		let productName;
+
+		// Validate session token
+		this.validateSessionToken(email, sessionToken).then((tempUser) => {
+			let tempUserKey = tempUser[datastore.KEY];
+			if (tempUserKey !== "") {
+				userKey = tempUserKey;
+				// Get product name from hash
+				const query = datastore.createQuery('Product').filter('hash', '=', productHash);
+				return datastore.runQuery(query);
+			} else {
+				deferred.reject("Invalid session token");
+				return;
+			}
+		}).then((results) => {
+			// Product hash not in database
+			if (results[0].length == 0) {
+				deferred.reject("Product does not exist.");
+				return;
+			}
+			// Get product name from hash
+			productName = results[0][0].name;
+			transaction = datastore.transaction();
+			return transaction.run();
+		}).then(() => transaction.get(userKey)).then(results => {
+			// Remove product from user's list
+			const user = results[0];
+			if (!user.flaggedProductList) {
+				deferred.reject("Product is not on user's list.");
+				return;
+			} else {
+				const index = user.flaggedProductList.indexOf(productName);
+				if (index == -1) {
+					deferred.reject("Product is not on user's list.");
+					return;
+				}
+				user.flaggedProductList.splice(index, 1);
+			}
+			transaction.save({
+				key: userKey,
+				data: user
+			});
+			return transaction.commit();
+		}).then(() => {
+			deferred.resolve(true);
+		}).catch((err) => {
+			if (!transaction) {
+				transaction.rollback();
+			}
+			console.log(err);
+			deferred.reject("transaction failed");
+		});
+
+		return deferred.promise;
+	}
+
+	checkProductInLists(productHash, email, sessionToken) {
+		let deferred = Q.defer();
+		let user;
+		let productName;
+
+		// Validate session token
+		this.validateSessionToken(email, sessionToken).then((tempUser) => {
+			user = tempUser;
+			const query = datastore.createQuery('Product').filter('hash', '=', productHash);
+			return datastore.runQuery(query);
+		}).then((results) => {
+			// Product hash not in database
+			if (results[0].length == 0) {
+				deferred.reject("Product does not exist.");
+				return;
+			}
+			// Get product name from hash
+			productName = results[0][0].name;
+
+			// Check if product is in user's product list
+			let inProductList = false;
+			if (user.productList) {
+				const index = user.productList.indexOf(productName);
+				if (index > -1) {
+					inProductList = true;
+				}
+			}
+			// Check if product is in user's flagged list
+			let inFlaggedProductList = false;
+			if (user.flaggedProductList) {
+				const index = user.flaggedProductList.indexOf(productName);
+				if (index > -1) {
+					inFlaggedProductList = true;
+				}
+			}
+			deferred.resolve({
+				inProductList: inProductList, 
+				inFlaggedProductList: inFlaggedProductList
+			});
+		});
+
+		return deferred.promise;
+	}
 }
 
 module.exports = DatabaseManager;
