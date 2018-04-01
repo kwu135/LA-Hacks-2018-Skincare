@@ -36,7 +36,7 @@ app.post('/signup', function(req, res) {
 		}
 	}).catch((err) => {
 		console.log(err);
-		res.status(500);
+		res.status(401);
 		res.send({ success: false, err: err });
 	});
 });

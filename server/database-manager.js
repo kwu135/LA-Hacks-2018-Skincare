@@ -13,7 +13,7 @@ class DatabaseManager
 	addUser(fname, lname, email, pw) {
 		var deferred = Q.defer();
 		let cookie;
-		
+
 		const userKey = datastore.key('User');
 		// Check for duplicate entity
 		const query = datastore.createQuery('User').filter('email', '=', email);
@@ -59,12 +59,17 @@ class DatabaseManager
 
 	/* Checks login information with database */ 
 	authenticateUser(email, pw) {
+		let deferred = Q.defer();
 		const query = datastore.createQuery('User').filter('email', '=', email);
 		let userKey;
 		let cookie;
 		let transaction = null;
 		let userInfo;
 		return datastore.runQuery(query).then(results => {
+			if (results[0].length == 0) {
+				deferred.reject("Invalid email");
+				return;
+			}
 			// Get user information
 			let user = results[0][0];
 			userKey = user[datastore.KEY];
@@ -76,7 +81,7 @@ class DatabaseManager
 				cookie = this.generate_key();
 				return transaction.run();
 			} else {
-				Promise.reject("Password mismatch");
+				deferred.reject("Password mismatch");
 			}
 		}).then(() => transaction.get(userKey)).then(results => {
 			const user = results[0];
@@ -87,13 +92,20 @@ class DatabaseManager
 			});
 			return transaction.commit();
 		}).then(() => {
-			return {
+			deferred.resolve({
 				"fname": userInfo.fname,
 				"lname": userInfo.lname,
 				"email": userInfo.email,
 				"sessionToken": cookie
+			});
+		}).catch(() => {
+			if (!transaction) {
+				transaction.rollback();
 			}
+			deferred.reject("transaction failed");
 		});
+
+		return deferred.promise;
 	}
 
 	validateSessionToken(email, sessionToken) {
