@@ -122,7 +122,7 @@ export default {
           if(response.status === 200) {
             if(response.body.success) {
               // get body data
-              let data = response.body;
+              let data = response.body.data;
 
               // Register cookies
               this.$cookie.set('firstName', data.fname, 1);

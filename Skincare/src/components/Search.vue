@@ -52,6 +52,8 @@ export default {
 </script>
 
 <style>
-  #search {
+  #searchField {
+    margin-left:4%;
+    margin-right:4%;
   }
 </style>

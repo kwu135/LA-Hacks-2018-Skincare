@@ -1,5 +1,6 @@
 <template>
   <div>
+    <br><br>
     <b-container class="bv-row">
       <b-row class="justify-content-md-center">
         <b-col md="6">
@@ -10,7 +11,7 @@
             </b-list-group>
         </b-col>
         <b-col md="4">
-          <b-img src="http://via.placeholder.com/300x200" fluid alt="Responsive Image" />
+          <b-img src="https://storage.googleapis.com/momento/noun_737023_cc.png" fluid alt="Responsive Image" />
 
           <b-button class="button" variant='info' v-if="!userOwnsProduct" @click="addProduct()">I use this product</b-button>
           <b-button class="button" variant='danger' v-else @click="removeProduct()">I don't use this product</b-button>
@@ -31,10 +32,29 @@
 export default {
   name: 'Product',
   mounted: function() {
-    this.$http.get(this.baseUrl + '/product-info/' + this.productHash).then(response => {
+    this.$http.get(this.baseUrl + '/product-info/?productHash=' + this.productHash).then(response => {
       if(response.status === 200) {
         if(response.body.success) {
-          console.log('Found product hash');
+          let data = response.body.data;
+
+          this.productName = data.name;
+          this.ingredients = data.ingredients;
+          this.category = data.category;
+
+          var credentials = {
+            productHash: this.productHash,
+            email: this.$cookie.get('email'),
+            sessionToken: this.$cookie.get('session')
+          }
+          this.$http.post(this.baseUrl + '/check-product-in-lists', credentials).then(response=> {
+            if(response.body.success){
+              this.userOwnsProduct = response.body.data.inProductList;
+              this.userFlaggedProduct = response.body.data.inFlaggedProductList;
+
+            }
+          }, response => {
+            console.log("Failed to get list data for product");
+          })
         }
       }
     
@@ -45,11 +65,8 @@ export default {
   data () {
     return {
       productHash: this.$route.params.product,
-      productName: 'OP Moisturizer',
-      ingredients: ['Hydraulic Acid',
-                    'Tea Tree Oils',
-                    'Glycolic Acid',
-                    'Almond Oil'],
+      productName: '',
+      ingredients: [],
       category: '',
       userOwnsProduct: false,
       userFlaggedProduct: false,

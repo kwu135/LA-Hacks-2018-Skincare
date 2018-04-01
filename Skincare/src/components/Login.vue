@@ -86,18 +86,29 @@ export default {
 
         this.$http.post('http://35.185.196.137:3000/login', credentials).then(response => {
         
-          // get body data
-          let data = response.body;
+          if(response.status === 200){
 
-          // Register cookies
-          this.$cookie.set('firstName', data.fname, 1);
-          this.$cookie.set('lastName', data.lname, 1);
-          this.$cookie.set('session', data.sessionToken, 1);
-          this.$cookie.set('email', data.email, 1);
-          this.$router.push('/');
+            if(!response.data.success) {
+              this.errors.push(response.data.err);
+              return;
+            }
+
+            // get body data
+            let data = response.body.data;
+
+            // Register cookies
+            this.$cookie.set('firstName', data.fname, 1);
+            this.$cookie.set('lastName', data.lname, 1);
+            this.$cookie.set('session', data.sessionToken, 1);
+            this.$cookie.set('email', data.email, 1);
+            this.$router.push('/');
+          } else {
+            this.errors.push("Cannot authenticate. Please try again");
+          }
         }, response => {
           // error callback
-          console.log("Failed to log in: " + response);
+          this.errors.push("Cannot authenticate. Please try again.");
+          console.log(response);
         });
       }
     }

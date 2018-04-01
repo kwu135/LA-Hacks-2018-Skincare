@@ -48,14 +48,14 @@
               </b-form-input>
               <icon name="plus-square" 
                     scale=2 
-                    color="#33D1FF" 
+                    color="#0099CC" 
                     v-on:click.native="addIngredient()"
                     v-b-tooltip.hover
                     title="Add new ingredient">
               </icon>
               <icon name="minus-square" 
                     scale=2 
-                    color="#FF5533" 
+                    color="#CC0000" 
                     v-on:click.native="deleteSelected()"
                     v-b-tooltip.hover
                     title="Delete selected ingredient(s)">        
@@ -135,7 +135,7 @@ export default {
           if(response.status === 200) {
             if(response.body.success) {
               console.log('Added new product');
-              this.$router.push('/product/' + response.body.data);
+              this.$router.push('/product/' + response.body.data.substring(0,10));
             }
           }
         }, response => {
