@@ -1,5 +1,6 @@
 var crypto = require('crypto');
 var Q = require('q');
+var md5 = require('md5');
 
 const Datastore = require('@google-cloud/datastore');
 const projectId = 'skincare-199709';
@@ -87,9 +88,6 @@ class DatabaseManager
 	}
 
 	validateSessionToken(email, sessionToken) {
-		console.log(email)
-		console.log(sessionToken)
-
 		const query = datastore.createQuery('User').filter('email', '=', email);
 		return datastore.runQuery(query).then(results => {
 			// Get user information
@@ -103,14 +101,16 @@ class DatabaseManager
 	}
 
 	/* Adds a new product to user's routine */
-	addProduct(productName, category, ingredients, email, sessionToken) {
+	createNewProduct(productName, category, ingredients, email, sessionToken) {
 		let deferred = Q.defer();
 		const productKey = datastore.key('Product');
 		let userKey;
 		let transaction = null;
 
+		// Validate session token
 		this.validateSessionToken(email, sessionToken).then((tempUserKey) => {
 			if (tempUserKey !== "") {
+				// Check for duplicate product entities
 				userKey = tempUserKey;
 				const query = datastore.createQuery('Product').filter('name', '=', productName);
 				return datastore.runQuery(query);
@@ -129,7 +129,8 @@ class DatabaseManager
 				data: [
 					{name: 'name', value: productName},
 					{name: 'category', value: category},
-					{name: 'ingredients', value: ingredients}
+					{name: 'ingredients', value: ingredients},
+					{name: 'hash', value: md5(productName)}
 				]
 			};
 			// Add product to database
@@ -155,6 +156,59 @@ class DatabaseManager
 			if (!transaction) {
 				transaction.rollback();
 			}
+			deferred.reject("transaction failed");
+		});
+
+		return deferred.promise;
+	}
+
+	addProductToRoutine(productHash, email, sessionToken) {
+		let deferred = Q.defer();
+		let userKey;
+		let transaction = null;
+		let productName;
+
+		// Validate session token
+		this.validateSessionToken(email, sessionToken).then((tempUserKey) => {
+			if (tempUserKey !== "") {
+				userKey = tempUserKey;
+				// Get product name from hash
+				const query = datastore.createQuery('Product').filter('hash', '=', productHash);
+				return datastore.runQuery(query);
+			} else {
+				deferred.reject("Invalid session token");
+				return;
+			}
+		}).then((results) => {
+			// Product hash not in database
+			if (results[0].length == 0) {
+				deferred.reject("Product does not exist.");
+				return;
+			}
+			// Get product name from hash
+			productName = results[0][0].name;
+			transaction = datastore.transaction();
+			return transaction.run();
+		}).then(() => transaction.get(userKey)).then(results => {
+			// Add product to user's list
+			const user = results[0];
+			if (!user.productList) {
+				user.productList = [productName];
+			} else {
+				user.productList.push(productName);
+			}
+			transaction.save({
+				key: userKey,
+				data: user
+			});
+			return transaction.commit();
+		}).then(() => {
+			deferred.resolve(true);
+		}).catch((err) => {
+			if (!transaction) {
+				transaction.rollback();
+			}
+			console.log(err);
 			deferred.reject("transaction failed");
 		});
 

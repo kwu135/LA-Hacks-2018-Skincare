@@ -1,6 +1,7 @@
 var bodyParser = require('body-parser');
 var express = require('express');
 let cors = require('cors');
+var md5 = require('md5');
 let DatabaseManager = require('./database-manager.js');
 
 var app = express();
@@ -65,33 +66,61 @@ app.post('/login', function(req, res) {
 	});
 });
 
-/* Add a product to user's routine */
-app.post('/add-product', function(req, res) {
+/* Creates a new product and adds to user's routine */
+app.post('/create-new-product', function(req, res) {
 	console.log(req.body);
 	// Check parameters aren't null
 	if (!req.body.productName || !req.body.category ||
 		!req.body.ingredients || !req.body.email || !req.body.sessionToken) {
 		res.status(400);
-		res.send("Missing product information.");
+		res.send("Missing information.");
 		return;
 	}
 	// Add new product
-	database.addProduct(req.body.productName, req.body.category, req.body.ingredients, req.body.email,
-		req.body.sessionToken).then((success) => {
+	const productHash = md5(req.body.productName);
+	database.createNewProduct(req.body.productName, req.body.category, req.body.ingredients,
+		req.body.email, req.body.sessionToken).then((success) => {
 		if (success) {
 			res.status(200);
-			res.send({ success: true });
+			res.send({ success: true, err: "", data: productHash });
 		} else {
 			res.status(500);
-			res.send({ success: false });
+			res.send({ success: false, err: "Failed to add new product to database.", data: productHash });
 		}
 	}).catch((err) => {
 		console.log(err);
 		res.status(500);
-		res.send({ success: false });
+		res.send({ success: false, err: err, data: productHash });
 	});
 });
 
+/* Add a product to user's routine */
+app.post('/add-product-to-routine', function(req, res) {
+	console.log(req.body);
+	// Check parameters aren't null
+	if (!req.body.productHash || !req.body.email || !req.body.sessionToken) {
+		req.status(400);
+		req.send("Missing information.");
+		return;
+	}
+	// Add product
+	database.addProductToRoutine(req.body.productHash, req.body.email,
+		req.body.sessionToken).then((success) => {
+		if (success) {
+			res.status(200);
+			res.send({ success: true, err: "" });
+		} else {
+			res.status(500);
+			res.send({ success: false, err: "Failed to add product to routine." });
+		}
+	}).catch((err) => {
+		console.log(err);
+		res.status(500);
+		res.send({ success: false, err: err });
+	});
+});
+
+/* Get a user's list of products */
 app.post('/get-product-list', function(req, res) {
 	console.log(req.body);
 	if (!req.body.email || !req.body.sessionToken) {
@@ -99,7 +128,7 @@ app.post('/get-product-list', function(req, res) {
 		res.send("Missing user information.");
 		return;
 	}
-
+	// Get product list
 	database.getProductList(req.body.email, req.body.sessionToken).then((productList) => {
 		if (productList != null) {
 			res.status(200);
