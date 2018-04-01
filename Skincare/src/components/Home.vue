@@ -67,7 +67,7 @@
 						text-variant="white"
 						align="left">
 						<p class="card-text">
-							<b>{{ harmfulIngredient.name }}<br /></b>
+							<b>{{ harmfulIngredient }}<br /></b>
 						</p>
 					</b-card>
 				</b-col>

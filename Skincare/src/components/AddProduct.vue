@@ -154,7 +154,7 @@ export default {
       console.log(this.ingredientInput);
       if(this.ingredientInput !== '') {
         var ingredient = this.ingredientInput;
-        var ingredients = ingredient.split(/[,\\n]/);
+        var ingredients = ingredient.split(/[,\n]/);
         ingredients.forEach(ingredient=> {
           if(ingredient.match(/(\w+)/)) {
             this.ingredients.push({name: ingredient, id: this.count++, selected: false});
