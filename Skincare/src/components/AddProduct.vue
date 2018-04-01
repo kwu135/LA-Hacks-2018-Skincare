@@ -41,7 +41,12 @@
           </div>
           <b-row class="modifiers">
             <b-col md="8" offset-md="2">
-              <b-form-input class="ingredient-input" v-model="ingredientName"
+              <p> Upload a picture to parse ingredients or type them in manually below </p>
+
+              <form name="upload" action="" method="post" enctype="multipart/form-data">
+                  <input type="file" v-on:change="singleUpload" multiple>
+              </form><br><br>
+              <b-form-input class="ingredient-input" v-model="ingredientInput"
                                 type="text"
                                 placeholder="Add an ingredient"
                                 @keydown.native="keydownHandler">
@@ -59,7 +64,7 @@
                     v-on:click.native="deleteSelected()"
                     v-b-tooltip.hover
                     title="Delete selected ingredient(s)">        
-              </icon> 
+              </icon>
             </b-col>
           </b-row>
         </b-col>
@@ -85,7 +90,7 @@ export default {
   data () {
     return {
       productName: '',
-      ingredientName: '',
+      ingredientInput: '',
       ingredients: [],
       count: 0,
       selectedCategory: null,
@@ -101,6 +106,7 @@ export default {
         {value: 'Face Oils', text: 'Face Oils'},
         {value: 'Acne Treatments', text: 'Acne Treatments'}
       ],
+      ingredientsImage: null,
       errors: []
     }
   },
@@ -131,7 +137,7 @@ export default {
           product.ingredients.push(ingredient.name);
         });
 
-        this.$http.post('http://35.185.196.137:3000/create-new-product', product).then(response => {
+        this.$http.post('http://35.185.245.119:3000/create-new-product', product).then(response => {
           if(response.status === 200) {
             if(response.body.success) {
               console.log('Added new product');
@@ -145,10 +151,16 @@ export default {
       }
     },
     addIngredient() {
-      if(this.ingredientName !== '') {
-        var ingredient = this.ingredientName;
-        this.ingredients.push({name: ingredient, id: this.count++, selected: false});
-        this.ingredientName = '';
+      console.log(this.ingredientInput);
+      if(this.ingredientInput !== '') {
+        var ingredient = this.ingredientInput;
+        var ingredients = ingredient.split(/[,\n]/);
+        ingredients.forEach(ingredient=> {
+          if(ingredient.match(/(\w+)/)) {
+            this.ingredients.push({name: ingredient, id: this.count++, selected: false});
+          }
+        });
+        this.ingredientInput = '';
       }
     },
     keydownHandler(event) {
@@ -168,8 +180,31 @@ export default {
       }
       this.ingredients = unselected;
     },
-    click() {
-      console.log("click")
+    singleUpload(imageFile) {
+      var formData = new FormData();
+      formData.append("picture", imageFile.srcElement.files[0]);
+
+      var self = this;
+      try {
+        event.preventDefault();
+        $.ajax({
+          type: 'post',
+          url: 'http://35.185.245.119:3000/get-ingredients-from-picture',
+          data: formData,
+          dataType: 'json',
+          contentType: false,
+          processData: false,
+          success: function(results) {
+            if(results.success) {
+              console.log(results);
+              self.ingredientInput = results.data;
+              self.addIngredient();
+            }
+          }
+        });
+      } catch (err) {
+        console.log(err);
+      }
     }
   }
 }
@@ -182,6 +217,7 @@ export default {
     border: solid 1px lightgray;
     transition: all 1s;
     display: inline-block;
+    background: white;
   }
 
   .list-complete-enter, .list-complete-leave-active {
@@ -189,7 +225,7 @@ export default {
   }
 
   .selected {
-    background-color: #33D1FF;
+    background-color: teal;
     color:white;
   }
 

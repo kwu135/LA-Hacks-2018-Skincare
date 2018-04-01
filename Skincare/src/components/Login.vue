@@ -84,7 +84,7 @@ export default {
           pw: md5(this.credentials.password)
         }
 
-        this.$http.post('http://35.185.196.137:3000/login', credentials).then(response => {
+        this.$http.post('http://35.185.245.119:3000/login', credentials).then(response => {
         
           if(response.status === 200){
 

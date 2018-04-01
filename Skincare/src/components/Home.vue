@@ -67,7 +67,7 @@
 						text-variant="white"
 						align="left">
 						<p class="card-text">
-							<b>{{ harmfulIngredient.name }}<br /></b>
+							<b>{{ harmfulIngredient }}<br /></b>
 						</p>
 					</b-card>
 				</b-col>
@@ -107,7 +107,7 @@ export default {
 			this.$router.push('/login');
 		}
 
-		var baseUrl = 'http://35.185.196.137:3000'
+		var baseUrl = 'http://35.185.245.119:3000'
 
 		var credentials = {
 			email: this.$cookie.get('email'),
@@ -127,21 +127,22 @@ export default {
 		    }
 		  }
 		}, response => {
-		  console.log("Failed to load data for product lists");
+		  console.error("Failed to load data for product lists");
+		});
+
+		this.$http.post(baseUrl + '/get-threat-ingredients', credentials).then(response => {
+			if(response.status == 200 && response.body.success) {
+				this.harmfulIngredients = response.body.data;
+			}
+		}, response => {
+			console.error("Failed to get ingredients");
 		});
 	},
 	data () {
 		return {
 			routineProducts: [],
 			threatProducts: [],
-			harmfulIngredients: [
-				{
-					name: 'Ingredient 1'
-				},
-				{
-					name: 'Ingredient 2'
-				}
-			],
+			harmfulIngredients: [],
 		}
 	},
 	methods: {
