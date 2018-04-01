@@ -99,7 +99,7 @@ class DatabaseManager
 				"sessionToken": cookie
 			});
 		}).catch(() => {
-			if (!transaction) {
+			if (transaction != null) {
 				transaction.rollback();
 			}
 			deferred.reject("transaction failed");
@@ -175,7 +175,7 @@ class DatabaseManager
 		}).then(() => {
 			deferred.resolve(true);
 		}).catch(() => {
-			if (!transaction) {
+			if (transaction != null) {
 				transaction.rollback();
 			}
 			deferred.reject("transaction failed");
@@ -228,7 +228,7 @@ class DatabaseManager
 		}).then(() => {
 			deferred.resolve(true);
 		}).catch((err) => {
-			if (!transaction) {
+			if (transaction != null) {
 				transaction.rollback();
 			}
 			console.log(err);
@@ -288,7 +288,7 @@ class DatabaseManager
 		}).then(() => {
 			deferred.resolve(true);
 		}).catch((err) => {
-			if (!transaction) {
+			if (transaction != null) {
 				transaction.rollback();
 			}
 			console.log(err);
@@ -373,7 +373,7 @@ class DatabaseManager
 		}).then(() => {
 			deferred.resolve(true);
 		}).catch((err) => {
-			if (!transaction) {
+			if (transaction != null) {
 				transaction.rollback();
 			}
 			console.log(err);
@@ -433,7 +433,7 @@ class DatabaseManager
 		}).then(() => {
 			deferred.resolve(true);
 		}).catch((err) => {
-			if (!transaction) {
+			if (transaction != null) {
 				transaction.rollback();
 			}
 			console.log(err);
