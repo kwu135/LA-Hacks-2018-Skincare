@@ -107,7 +107,7 @@ export default {
 			this.$router.push('/login');
 		}
 
-		var baseUrl = 'http://35.185.196.137:3000'
+		var baseUrl = 'http://35.185.245.119:3000'
 
 		var credentials = {
 			email: this.$cookie.get('email'),

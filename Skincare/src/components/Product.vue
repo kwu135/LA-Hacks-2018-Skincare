@@ -70,7 +70,7 @@ export default {
       category: '',
       userOwnsProduct: false,
       userFlaggedProduct: false,
-      baseUrl: 'http://35.185.196.137:3000'
+      baseUrl: 'http://35.185.245.119:3000'
     }
     
   },

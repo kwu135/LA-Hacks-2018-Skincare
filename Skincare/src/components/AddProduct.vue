@@ -131,7 +131,7 @@ export default {
           product.ingredients.push(ingredient.name);
         });
 
-        this.$http.post('http://35.185.196.137:3000/create-new-product', product).then(response => {
+        this.$http.post('http://35.185.245.119:3000/create-new-product', product).then(response => {
           if(response.status === 200) {
             if(response.body.success) {
               console.log('Added new product');
@@ -167,9 +167,6 @@ export default {
         }
       }
       this.ingredients = unselected;
-    },
-    click() {
-      console.log("click")
     }
   }
 }
