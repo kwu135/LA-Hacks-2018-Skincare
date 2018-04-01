@@ -18,7 +18,8 @@
                             id="username"
                             v-model="credentials.password"
                             required
-                            placeholder="Password">
+                            placeholder="Password"
+                            @keydown.native="keydownHandler">
               </b-form-input>
             </b-form-group>
             <b-button size="md" variant="info" @click="login()">
@@ -58,6 +59,11 @@ export default {
     redirectIfLoggedIn() {
       if(this.$cookie.get('session')) {
         this.$router.push('/');
+      }
+    },
+    keydownHandler(event) {
+      if(event.which === 13) {
+        this.login();
       }
     },
     login() {

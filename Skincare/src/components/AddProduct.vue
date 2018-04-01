@@ -65,7 +65,7 @@
         </b-col>
       </b-row>
     </b-container>
-    <b-button class="button" size="md" variant="primary" @click="addProduct()">
+    <b-button class="button" size="md" variant="info" @click="addProduct()">
       Submit
     </b-button>
     <p v-if="errors.length">

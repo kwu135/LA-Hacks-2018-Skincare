@@ -82,6 +82,11 @@ export default {
     removeProduct() {
       this.userOwnsProduct = false;
       //remove product method
+      var product = {
+        "productHash": this.productHash,
+        "email": this.$cookie.get('email'),
+        "sessionToken": this.$cookie.get('session'),
+      };
       this.$http.post(this.baseUrl + '/remove-product-from-routine', product).then(response => {
       
         if(response.status === 200) {
@@ -96,6 +101,11 @@ export default {
     },
     flagBadProduct() {
       this.userFlaggedProduct = true;
+      var product = {
+        "productHash": this.productHash,
+        "email": this.$cookie.get('email'),
+        "sessionToken": this.$cookie.get('session'),
+      };
       this.$http.post(this.baseUrl + '/add-threat-flag-to-product', product).then(response => {
       
         if(response.status === 200) {
@@ -110,6 +120,11 @@ export default {
     },
     unflagBadProduct() {
       this.userFlaggedProduct = false;
+      var product = {
+        "productHash": this.productHash,
+        "email": this.$cookie.get('email'),
+        "sessionToken": this.$cookie.get('session'),
+      };
       this.$http.post(this.baseUrl + '/remove-threat-flag-from-product', product).then(response => {
       
         if(response.status === 200) {
