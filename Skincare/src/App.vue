@@ -47,6 +47,7 @@ export default {
       this.$cookie.delete('session');
       this.$cookie.delete('firstName');
       this.$cookie.delete('lastName');
+      this.$cookie.delete('email');
 
       this.$router.push('/login');
     }

@@ -21,7 +21,7 @@
                             placeholder="Password">
               </b-form-input>
             </b-form-group>
-            <b-button size="sm" variant="primary" @click="login()">
+            <b-button size="md" variant="info" @click="login()">
               Login
             </b-button>
           </b-form>
@@ -75,15 +75,24 @@ export default {
         // TO-DO
         var credentials = {
           email: this.credentials.email,
-          password: md5(this.credentials.password)
+          pw: md5(this.credentials.password)
         }
-        console.log('Logging in');
 
-        // Register cookies
-        this.$cookie.set('firstName', 'Yuna', 1);
-        this.$cookie.set('lastName', 'Lee', 1);
-        this.$cookie.set('session', '120sd9f23iw', 1);
-        this.$router.push('/');
+        this.$http.post('http://35.185.196.137:3000/login', credentials).then(response => {
+        
+          // get body data
+          let data = response.body;
+
+          // Register cookies
+          this.$cookie.set('firstName', data.fname, 1);
+          this.$cookie.set('lastName', data.lname, 1);
+          this.$cookie.set('session', data.sessionToken, 1);
+          this.$cookie.set('email', data.email, 1);
+          this.$router.push('/');
+        }, response => {
+          // error callback
+          console.log("Failed to log in: " + response);
+        });
       }
     }
   }
