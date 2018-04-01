@@ -4,6 +4,22 @@ let cors = require('cors');
 var md5 = require('md5');
 let DatabaseManager = require('./database-manager.js');
 
+var multer = require('multer');
+var multerStorage = multer.diskStorage({
+	destination: function (req, file, cb) {
+		cb(null, "uploads/");
+	},
+	filename: function (req, file, cb) {
+		var extension: string = file.originalname.substring(file.originalname.lastIndexOf('.'));
+		var filename: string = file.originalname.substring(0, file.originalname.lastIndexOf('.'));
+		var time: number = new Date().getTime();
+		filename += "_" + time;
+		filename += extension;
+		cb(null, filename);
+	}
+})
+var upload = multer({ storage: multerStorage });
+
 var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -285,6 +301,10 @@ app.get('/product-search', function(req, res) {
 		res.status(500);
 		res.send({ success: false, err: err });
 	});
+});
+
+app.post('/getIngredientsFromPicture', upload.single("picture"), function(req, res)) {
+	console.log(req);
 });
 
 app.listen(3000);

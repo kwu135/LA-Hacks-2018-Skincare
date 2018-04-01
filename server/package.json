@@ -17,6 +17,7 @@
     "js-cookie": "^2.2.0",
     "md5": "^2.2.1",
     "memjs": "^1.2.0",
+    "multer": "*",
     "passport-google-oauth": "^1.0.0",
     "passport-local": "^1.0.0",
     "q": "*"
