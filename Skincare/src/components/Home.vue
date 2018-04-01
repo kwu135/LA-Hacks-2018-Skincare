@@ -127,21 +127,22 @@ export default {
 		    }
 		  }
 		}, response => {
-		  console.log("Failed to load data for product lists");
+		  console.error("Failed to load data for product lists");
+		});
+
+		this.$http.post(baseUrl + '/get-threat-ingredients', credentials).then(response => {
+			if(response.status == 200 && response.body.success) {
+				this.harmfulIngredients = response.body.data;
+			}
+		}, response => {
+			console.error("Failed to get ingredients");
 		});
 	},
 	data () {
 		return {
 			routineProducts: [],
 			threatProducts: [],
-			harmfulIngredients: [
-				{
-					name: 'Ingredient 1'
-				},
-				{
-					name: 'Ingredient 2'
-				}
-			],
+			harmfulIngredients: [],
 		}
 	},
 	methods: {
