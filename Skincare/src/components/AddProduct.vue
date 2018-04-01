@@ -41,6 +41,11 @@
           </div>
           <b-row class="modifiers">
             <b-col md="8" offset-md="2">
+              <p> Upload a picture to parse ingredients or type them in manually below </p>
+
+              <form name="upload" action="" method="post" enctype="multipart/form-data">
+                  <input type="file" v-on:change="singleUpload" multiple>
+              </form><br><br>
               <b-form-input class="ingredient-input" v-model="ingredientInput"
                                 type="text"
                                 placeholder="Add an ingredient"
@@ -59,7 +64,7 @@
                     v-on:click.native="deleteSelected()"
                     v-b-tooltip.hover
                     title="Delete selected ingredient(s)">        
-              </icon> 
+              </icon>
             </b-col>
           </b-row>
         </b-col>
@@ -101,6 +106,7 @@ export default {
         {value: 'Face Oils', text: 'Face Oils'},
         {value: 'Acne Treatments', text: 'Acne Treatments'}
       ],
+      ingredientsImage: null,
       errors: []
     }
   },
@@ -145,11 +151,14 @@ export default {
       }
     },
     addIngredient() {
+      console.log(this.ingredientInput);
       if(this.ingredientInput !== '') {
         var ingredient = this.ingredientInput;
-        var ingredients = ingredient.split(',');
+        var ingredients = ingredient.split(/[,\\n]/);
         ingredients.forEach(ingredient=> {
-          this.ingredients.push({name: ingredient, id: this.count++, selected: false});
+          if(ingredient.match(/(\w+)/)) {
+            this.ingredients.push({name: ingredient, id: this.count++, selected: false});
+          }
         });
         this.ingredientInput = '';
       }
@@ -170,6 +179,32 @@ export default {
         }
       }
       this.ingredients = unselected;
+    },
+    singleUpload(imageFile) {
+      var formData = new FormData();
+      formData.append("picture", imageFile.srcElement.files[0]);
+
+      var self = this;
+      try {
+        event.preventDefault();
+        $.ajax({
+          type: 'post',
+          url: 'http://35.185.245.119:3000/get-ingredients-from-picture',
+          data: formData,
+          dataType: 'json',
+          contentType: false,
+          processData: false,
+          success: function(results) {
+            if(results.success) {
+              console.log(results);
+              self.ingredientInput = results.data;
+              self.addIngredient();
+            }
+          }
+        });
+      } catch (err) {
+        console.log(err);
+      }
     }
   }
 }
