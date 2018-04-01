@@ -3,9 +3,11 @@ var Q = require('q');
 var md5 = require('md5');
 
 const Datastore = require('@google-cloud/datastore');
+const Vision = require('@google-cloud/vision');
 const projectId = 'skincare-199709';
 const keyFilename = "/Users/yunalee/Desktop/Skincare-fea4f318f260.json"
 const datastore = new Datastore({projectId: projectId, keyFilename: keyFilename});
+const vision = new Vision.ImageAnnotatorClient({projectId: projectId, keyFilename: keyFilename});
 
 class DatabaseManager
 {
@@ -501,6 +503,36 @@ class DatabaseManager
 			});
 			return searchResults;
 		});
+	}
+
+	getIngredientsFromPicture(filepath) {
+		var deferred = Q.defer();
+
+		Q.fcall(() => { }).then(() => {
+			var request = {
+				source: {
+					filename: filepath
+				}
+			};
+
+			return vision.textDetection(request);
+		}).then((results) => {
+			if (results[0].error) {
+				console.log('Error in textDetection():', results[0].error);
+				deferred.reject(results[0].error);
+				return;
+			}
+
+			const detections = results[0].textAnnotations;
+			detections.forEach(text => console.log(text));
+
+			deferred.resolve(detections);
+		}).catch((err) => {
+			console.error('Error in getIngredientsFromPicture():', err);
+			deferred.reject(err);
+		});
+
+		return deferred.promise;
 	}
 }
 

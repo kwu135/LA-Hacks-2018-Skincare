@@ -4,15 +4,18 @@ let cors = require('cors');
 var md5 = require('md5');
 let DatabaseManager = require('./database-manager.js');
 
+const projectId = 'skincare-199709';
+const keyFilename = "/Users/yunalee/Desktop/Skincare-fea4f318f260.json"
+
 var multer = require('multer');
 var multerStorage = multer.diskStorage({
 	destination: function (req, file, cb) {
 		cb(null, "uploads/");
 	},
 	filename: function (req, file, cb) {
-		var extension: string = file.originalname.substring(file.originalname.lastIndexOf('.'));
-		var filename: string = file.originalname.substring(0, file.originalname.lastIndexOf('.'));
-		var time: number = new Date().getTime();
+		var extension = file.originalname.substring(file.originalname.lastIndexOf('.'));
+		var filename = file.originalname.substring(0, file.originalname.lastIndexOf('.'));
+		var time = new Date().getTime();
 		filename += "_" + time;
 		filename += extension;
 		cb(null, filename);
@@ -33,7 +36,7 @@ app.post('/signup', function(req, res) {
 	// Check parameters aren't null
 	if (!req.body.fname || !req.body.lname || !req.body.email || !req.body.pw) {
 		res.status("400");
-		res.send("Missing registration details.");
+		res.send({success: false, err: "Missing registration details."});
 		return;
 	}
 	// Attempt registration
@@ -63,7 +66,7 @@ app.post('/login', function(req, res) {
 	// Check parameters aren't null
 	if (!req.body.email || !req.body.pw) {
 		res.status("400");
-		res.send("Missing login details.");
+		res.send({success: false, err: "Missing login details."});
 		return;
 	}
 	// Attempt login
@@ -95,7 +98,7 @@ app.post('/create-new-product', function(req, res) {
 	if (!req.body.productName || !req.body.category ||
 		!req.body.ingredients || !req.body.email || !req.body.sessionToken) {
 		res.status(400);
-		res.send("Missing information.");
+		res.send({success: false, err: "Missing information."});
 		return;
 	}
 	// Add new product
@@ -122,7 +125,7 @@ app.post('/add-product-to-routine', function(req, res) {
 	// Check parameters aren't null
 	if (!req.body.productHash || !req.body.email || !req.body.sessionToken) {
 		req.status(400);
-		req.send("Missing information.");
+		req.send({success: false, err: "Missing information."});
 		return;
 	}
 	// Add product
@@ -147,7 +150,7 @@ app.post('/remove-product-from-routine', function(req, res) {
 		// Check parameters aren't null
 	if (!req.body.productHash || !req.body.email || !req.body.sessionToken) {
 		req.status(400);
-		req.send("Missing information.");
+		req.send({success: false, err: "Missing information."});
 		return;
 	}
 	// Add product
@@ -172,7 +175,7 @@ app.post('/get-product-lists', function(req, res) {
 	console.log(req.body);
 	if (!req.body.email || !req.body.sessionToken) {
 		res.status(400);
-		res.send("Missing user information.");
+		res.send({success: false, err: "Missing user information."});
 		return;
 	}
 	// Get product list
@@ -195,7 +198,7 @@ app.post('/get-product-lists', function(req, res) {
 app.get('/product-info', function(req, res) {
 	if (!req.query.productHash) {
 		res.status(400);
-		res.send("Missing product hash.");
+		res.send({success: false, err: "Missing product hash."});
 		return;
 	}
 	// Get product info
@@ -218,7 +221,7 @@ app.get('/product-info', function(req, res) {
 app.post('/add-threat-flag-to-product', function(req, res) {
 	if (!req.body.productHash || !req.body.email || !req.body.sessionToken) {
 		res.status(400);
-		res.send("Missing arguments");
+		res.send({success: false, err: "Missing arguments"});
 	}
 
 	database.addThreatFlagToProduct(req.body.productHash, req.body.email, req.body.sessionToken).then((success) => {
@@ -240,7 +243,7 @@ app.post('/add-threat-flag-to-product', function(req, res) {
 app.post('/remove-threat-flag-from-product', function(req, res) {
 	if (!req.body.productHash || !req.body.email || !req.body.sessionToken) {
 		res.status(400);
-		res.send("Missing arguments");
+		res.send({success: false, err: "Missing arguments"});
 	}
 	
 	database.removeThreatFlagToProduct(req.body.productHash, req.body.email, req.body.sessionToken).then((success) => {
@@ -262,7 +265,7 @@ app.post('/remove-threat-flag-from-product', function(req, res) {
 app.post('/check-product-in-lists', function(req, res) {
 	if (!req.body.productHash || !req.body.email || !req.body.sessionToken) {
 		res.status(400);
-		res.send("Missing arguments");
+		res.send({success: false, err: "Missing arguments"});
 	}
 	
 	database.checkProductInLists(req.body.productHash, req.body.email, req.body.sessionToken).then((inList) => {
@@ -284,7 +287,7 @@ app.post('/check-product-in-lists', function(req, res) {
 app.get('/product-search', function(req, res) {
 	if (!req.query.q) {
 		res.status(400);
-		res.send("Missing query string.");
+		res.send({success: false, err: "Missing query string."});
 		return;
 	}
 	// Get product info
@@ -303,10 +306,22 @@ app.get('/product-search', function(req, res) {
 	});
 });
 
-app.post('/getIngredientsFromPicture', upload.single("picture"), function(req, res)) {
+app.post('/getIngredientsFromPicture', upload.single("picture"), function(req, res) {
 	console.log(req);
+	if (!req.file.path) {
+		res.status(400);
+		res.send({success: true, err: "Missing filepath"})
+	}
+	database.getIngredientsFromPicture(req.file.path).then((ingredients) => {
+		res.status(200);
+		res.send({success: true, err: "", data: ingredients});
+	}).catch((err) => {
+		console.log(err);
+		res.status(500);
+		res.send({ success: false, err: err });
+	});
 });
 
 app.listen(3000);
-
+console.log("Server started on port 3000");
 
