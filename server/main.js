@@ -24,12 +24,12 @@ app.post('/signup', function(req, res) {
 	database.addUser(req.body.fname, req.body.lname, req.body.email, req.body.pw).then((userInfo) => {
 		if (userInfo) {
 			res.status(200);
-			res.send({
+			res.send({ success: true, err:"", data: {
 				"fname": userInfo.fname,
 				"lname": userInfo.lname,
 				"email": userInfo.email,
 				"sessionToken": userInfo.sessionToken
-			});
+			}});
 		} else {
 			res.status(500);
 			res.send({ success: false, err: "Invalid user." });
@@ -54,12 +54,12 @@ app.post('/login', function(req, res) {
 	database.authenticateUser(req.body.email, req.body.pw).then((userInfo) => {
 		if (userInfo) {
 			res.status(200);
-			res.send({
+			res.send({ success: true, err:"", data: {
 				"fname": userInfo.fname,
 				"lname": userInfo.lname,
 				"email": userInfo.email,
 				"sessionToken": userInfo.sessionToken
-			});
+			}});
 		} else {
 			res.status(500);
 			res.send({ success: false, err: "Invalid user." });
