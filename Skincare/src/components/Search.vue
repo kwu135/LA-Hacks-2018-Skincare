@@ -18,15 +18,14 @@
       </b-row>
         <b-col md="8" offset-md="2">
           <b-card bg-variant="light" header="Search results">
-            <b-card-group deck>
-              <b-card align="center" 
-                  v-for="(product,index) in results"
+            <b-card-group deck v-for="(product,index) in results"
                   v-on:click="redirect(product.hash)">
+              <b-card>
                 <div class="row-flexbox">
                   <div class="row-flexbox-box">
                     <img src="https://storage.googleapis.com/momento/noun_737023_cc.png" class="product-card-img">
                   </div>
-                  <div class="row-flexbox-box">
+                  <div class="row-flexbox-box search">
                     <h3 class="card-text">
                       {{ product.name }}
                     </h3>
@@ -110,7 +109,7 @@ export default {
     margin-bottom: 1.25rem !important;
   }
 
-  .card-text {
+  .search .card-text {
     color: teal;
   }
 </style>
