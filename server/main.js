@@ -306,7 +306,7 @@ app.get('/product-search', function(req, res) {
 	});
 });
 
-app.post('/getIngredientsFromPicture', upload.single("picture"), function(req, res) {
+app.post('/get-ingredients-from-picture', upload.single("picture"), function(req, res) {
 	console.log(req);
 	if (!req.file.path) {
 		res.status(400);
