@@ -506,13 +506,7 @@ class DatabaseManager
 		var deferred = Q.defer();
 
 		Q.fcall(() => { }).then(() => {
-			var request = {
-				source: {
-					filename: filepath
-				}
-			};
-
-			return vision.textDetection(request);
+			return vision.textDetection(filepath);
 		}).then((results) => {
 			if (results[0].error) {
 				console.log('Error in textDetection():', results[0].error);
