@@ -13,6 +13,12 @@
         <b-col md="4">
           <b-img src="https://storage.googleapis.com/momento/noun_737023_cc.png" fluid alt="Responsive Image" />
 
+          <b-card bg-variant="light"
+                  header="Category"
+                  class="text-center">
+              <p class="card-text">{{this.category}}</p>
+          </b-card>
+
           <b-button class="button" variant='info' v-if="!userOwnsProduct" @click="addProduct()">I use this product</b-button>
           <b-button class="button" variant='danger' v-else @click="removeProduct()">I don't use this product</b-button>
 

@@ -41,7 +41,7 @@
           </div>
           <b-row class="modifiers">
             <b-col md="8" offset-md="2">
-              <b-form-input class="ingredient-input" v-model="ingredientName"
+              <b-form-input class="ingredient-input" v-model="ingredientInput"
                                 type="text"
                                 placeholder="Add an ingredient"
                                 @keydown.native="keydownHandler">
@@ -85,7 +85,7 @@ export default {
   data () {
     return {
       productName: '',
-      ingredientName: '',
+      ingredientInput: '',
       ingredients: [],
       count: 0,
       selectedCategory: null,
@@ -145,10 +145,13 @@ export default {
       }
     },
     addIngredient() {
-      if(this.ingredientName !== '') {
-        var ingredient = this.ingredientName;
-        this.ingredients.push({name: ingredient, id: this.count++, selected: false});
-        this.ingredientName = '';
+      if(this.ingredientInput !== '') {
+        var ingredient = this.ingredientInput;
+        var ingredients = ingredient.split(',');
+        ingredients.forEach(ingredient=> {
+          this.ingredients.push({name: ingredient, id: this.count++, selected: false});
+        });
+        this.ingredientInput = '';
       }
     },
     keydownHandler(event) {
@@ -179,6 +182,7 @@ export default {
     border: solid 1px lightgray;
     transition: all 1s;
     display: inline-block;
+    background: white;
   }
 
   .list-complete-enter, .list-complete-leave-active {
@@ -186,7 +190,7 @@ export default {
   }
 
   .selected {
-    background-color: #33D1FF;
+    background-color: teal;
     color:white;
   }
 
